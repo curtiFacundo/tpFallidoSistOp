@@ -3,7 +3,5 @@
 
 #include<stdio.h>
 #include<stdlib.h>
-#include<commons/log.h>
-
 
 #endif /* KERNEL_MAIN_H_ */

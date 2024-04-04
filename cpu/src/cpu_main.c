@@ -4,8 +4,8 @@
 #include "cpu_main.h"
 
 int main(int argc, char* argv[]) {
-    t_log* logger;
-    logger = log_create("logsCPU.log","logsCPU",true,LOG_LEVEL_INFO);
+    
+    t_log* logger = iniciar_log(logger, "CPU.log", "CPU");
 	log_info(logger,"Hola! CPU");
     log_destroy(logger);
     return 0;
