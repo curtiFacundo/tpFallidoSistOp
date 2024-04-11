@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <utils/hello.h>
+#include <utils/utils.h>
 #include "memoria_main.h"
 
 int main(int argc, char* argv[]) {

@@ -1,9 +1,9 @@
-#include <utils/hello.h>
+#include <utils/utils.h>
 
 //defines de operaciones
 #define OPERACION1 0
 
-
+t_log* logger;
 
 void decir_hola(char* quien) {
     printf("Hola desde %s!!\n", quien);
