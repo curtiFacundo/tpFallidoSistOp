@@ -4,7 +4,7 @@
 #include "memoria_main.h"
 
 int main(int argc, char* argv[]) {
-    t_log* logger = iniciar_log(logger, "Memoria.log", "Memoria");
+    logger = log_create("Memoria.log", "Memoria", 1, LOG_LEVEL_DEBUG);
 	log_info(logger,"Hola! Memoria");
     log_destroy(logger);
     return 0;

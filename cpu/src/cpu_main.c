@@ -5,7 +5,7 @@
 
 int main(int argc, char* argv[]) {
     
-    t_log* logger = iniciar_log(logger, "CPU.log", "CPU");
+    logger = log_create("CPU.log", "CPU", 1, LOG_LEVEL_DEBUG);
 	log_info(logger,"Hola! CPU");
     log_destroy(logger);
     return 0;
