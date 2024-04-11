@@ -5,8 +5,10 @@
 
 int main(int argc, char* argv[]) {
     
-    t_log* logger = iniciar_log(logger, "Kernel.log", "Kernel");
+    int socket_id = iniciar_servidor();
+    logger = log_create("kernel.log", "Kernel", 1, LOG_LEVEL_DEBUG);
     log_info(logger,"Hola! Kernel");
     log_destroy(logger);
+    
     return 0;
 }
