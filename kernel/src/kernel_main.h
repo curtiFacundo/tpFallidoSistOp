@@ -17,5 +17,7 @@ void leer_consola(t_log*);
 void paquete(int);
 void terminar_programa(int, t_log*, t_config*);
 int crearConexionCPU(t_log* logger,int conexion,char* ip, char* puerto,char* valor);
+int serServidorIO(void);
+void iterator(char* value);
 
 #endif /* KERNEL_MAIN_H_ */

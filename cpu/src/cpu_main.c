@@ -3,16 +3,13 @@
 #include <utils/utils.h>
 #include "cpu_main.h"
 
-int Saludar(void) {
-    
-    logger = log_create("CPU.log", "CPU", 1, LOG_LEVEL_DEBUG);
-	log_info(logger,"Hola! CPU");
-    log_destroy(logger);
+int main(void) {
+	abrirServerCPU();
     return 0;
 }
 
-int main(void) {
-	logger = log_create("log.log", "Servidor", 1, LOG_LEVEL_DEBUG);
+int abrirServerCPU(void) {
+	logger = log_create("cpu.log", "cpu", 1, LOG_LEVEL_DEBUG);
 
 	int server_fd = iniciar_servidor();
 	log_info(logger, "Servidor listo para recibir al cliente");
@@ -38,6 +35,7 @@ int main(void) {
 			break;
 		}
 	}
+	log_destroy(logger);
 	return EXIT_SUCCESS;
 }
 

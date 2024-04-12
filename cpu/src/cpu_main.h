@@ -8,7 +8,8 @@
 
 #include "../../utils/src/utils/utils.h"
 
-int Saludar(void);
+int main(void);
+int abrirServerCPU(void);
 void iterator(char* value);
 
 #endif /* CPU_MAIN_H_ */
