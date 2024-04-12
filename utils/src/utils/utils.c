@@ -206,3 +206,32 @@ void decir_hola(char* quien) {
         close(socket_cliente);
     }
 //socket
+
+void leer_consola(t_log* logger)
+{
+	char* leido;
+	while(!string_is_empty(leido = readline("> "))){
+		log_info(logger, leido);
+	}
+	free(leido);
+}
+
+void paquete(int conexion)
+{
+	char* leido;
+	t_paquete* paquete = crear_paquete();
+	while(!string_is_empty(leido = readline("> "))){
+		agregar_a_paquete(paquete, leido, strlen(leido)+1);
+	}
+	enviar_paquete(paquete, conexion);
+	free(leido);
+	eliminar_paquete(paquete);
+}
+
+void terminar_programa(int conexion, t_log* logger, t_config* config)
+{
+	log_destroy(logger);
+	close(conexion);
+	config_destroy(config);
+
+}
