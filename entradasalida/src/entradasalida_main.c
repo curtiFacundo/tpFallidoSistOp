@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <utils/utils.h>
 #include "entradasalida_main.h"
 
 int main(int argc, char* argv[]) {

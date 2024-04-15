@@ -15,7 +15,7 @@
 #include <unistd.h>
 #include <sys/socket.h>
 
-#define PUERTO "4444"
+#define PUERTO "4444" //ojo -> Hardcodeado. 
 
 /* Orden de conexiones:
 Server -> Cliente:
@@ -26,12 +26,11 @@ Server -> Cliente:
 * I/O -> Memoria
 */
 
-// typedef enum
-// {
-// 	OPERACION1,
-//     OPERACION2,
+typedef enum
+{
+    HANDSHAKE
 
-// }operaciones_kernel;
+}protocolo_socket;
 
 
 typedef enum

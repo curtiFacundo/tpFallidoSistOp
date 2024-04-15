@@ -132,7 +132,7 @@ void decir_hola(char* quien) {
 
         if (connect(socket_cliente, server_info->ai_addr, server_info->ai_addrlen)==-1){
             log_error(logger, "no se pudo establecer conexion al servidor");
-        }
+        }else log_info(logger, "Conectado al servidor");
 
         freeaddrinfo(server_info);
 

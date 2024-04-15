@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <utils/utils.h>
 #include "cpu_main.h"
 
 int main(void) {

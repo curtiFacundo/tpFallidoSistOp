@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <utils/utils.h>
 #include "memoria_main.h"
 
 int Saludar(void) {
