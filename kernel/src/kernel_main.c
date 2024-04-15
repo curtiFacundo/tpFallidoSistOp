@@ -7,7 +7,10 @@ int main(int argc, char* argv[]) {
     
 	/*
 	TO DO list
-	Mover la secuencia de arranque del server de kernel a su propia funcion
+	* Mover la secuencia de arranque del server de kernel a su propia funcion
+	* Conexion con CPU: hacer que Kernel sea Server
+	* iniciar_config(): Mover a utils.c
+	* serServidorIO(): generalizar? hasta que tengamos hilos, atajar las operaciones una por una
 	*/
 
     int conexion;
