@@ -16,7 +16,7 @@ t_config* iniciar_config(void);
 void leer_consola(t_log*);
 void paquete(int);
 void terminar_programa(int, t_log*, t_config*);
-int crearConexionCPU(t_log* logger,int conexion,char* ip, char* puerto,char* valor);
+int crearConexionCPU(int conexion,char* ip, char* puerto,char* valor); //--logger. No es necesario ya que la variable es global
 int serServidorIO(void);
 void iterator(char* value);
 

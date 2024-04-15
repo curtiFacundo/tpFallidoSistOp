@@ -6,8 +6,8 @@
 int main(int argc, char* argv[]) {
     
 	/*
-	TO DO list:
-	
+	TO DO list
+	Mover la secuencia de arranque del server de kernel a su propia funcion
 	*/
 
     int conexion;
@@ -23,8 +23,8 @@ int main(int argc, char* argv[]) {
     puerto = config_get_string_value(config, "PUERTO");
 	valor = config_get_string_value(config, "CLAVE");
     //serServidorIO();
-    crearConexionCPU(logger,conexion,ip,puerto,valor);
-    log_destroy(logger);
+    crearConexionCPU(conexion,ip,puerto,valor); //--logger. No es necesario ya que la variable es global
+	terminar_programa(conexion, logger, config); //logger: redundante pero esta definido asi en utils.h
     return 0;
 }
 
@@ -37,7 +37,7 @@ t_config* iniciar_config(void)
 	return nuevo_config;
 }
 
-int crearConexionCPU(t_log* logger,int conexion, char* ip, char* puerto,char* valor) {
+int crearConexionCPU(int conexion, char* ip, char* puerto,char* valor) {
         conexion = crear_conexion(ip, puerto, logger);
         enviar_mensaje(valor, conexion);
         paquete(conexion);

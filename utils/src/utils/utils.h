@@ -17,6 +17,15 @@
 
 #define PUERTO "4444"
 
+/* Orden de conexiones:
+Server -> Cliente:
+* Kernel -> CPU
+* Kernel -> Memoria
+* CPU -> Memoria
+* I/O -> Kernel
+* I/O -> Memoria
+*/
+
 // typedef enum
 // {
 // 	OPERACION1,
