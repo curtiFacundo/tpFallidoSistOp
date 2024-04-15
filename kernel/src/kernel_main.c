@@ -4,7 +4,11 @@
 #include "kernel_main.h"
 
 int main(int argc, char* argv[]) {
-
+    
+	/*
+	TO DO list:
+	
+	*/
 
     int conexion;
 	char* ip;

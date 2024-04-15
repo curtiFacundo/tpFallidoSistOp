@@ -4,7 +4,12 @@
 #include "entradasalida_main.h"
 
 int main(int argc, char* argv[]) {
-    
+        
+	/*
+	TO DO list:
+	
+	*/
+
 	char* ip;
 	char* puerto;
 	char* valor;

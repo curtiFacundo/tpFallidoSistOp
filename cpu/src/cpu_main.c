@@ -4,6 +4,11 @@
 #include "cpu_main.h"
 
 int main(void) {
+    
+	/*
+	TO DO list:
+	
+	*/
 
 	logger = log_create("cpu.log", "cpu", 1, LOG_LEVEL_DEBUG); //movido al mail desde abrirServerCPU
 	

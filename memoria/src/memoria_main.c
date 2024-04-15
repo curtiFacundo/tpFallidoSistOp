@@ -10,6 +10,12 @@ int Saludar(void) {
 }
 
 int main(void) {
+	    
+	/*
+	TO DO list:
+	
+	*/
+
 	logger = log_create("memoria.log", "memoria", 1, LOG_LEVEL_DEBUG);
 
 	int server_fd = iniciar_servidor();
