@@ -4,7 +4,8 @@
 #include "kernel_main.h"
 
 int main(int argc, char* argv[]) {
-    
+
+
     int conexion;
 	char* ip;
 	char* puerto;
@@ -40,7 +41,7 @@ int crearConexionCPU(t_log* logger,int conexion, char* ip, char* puerto,char* va
 }
 
 int serServidorIO(void) {
-	logger = log_create("CPU.log", "CPU", 1, LOG_LEVEL_DEBUG);
+	//logger = log_create("CPU.log", "CPU", 1, LOG_LEVEL_DEBUG); es necesario? aparte abre un log de CPU en el modulo kernel
 
 	int server_fd = iniciar_servidor();
 	log_info(logger, "Servidor listo para recibir");

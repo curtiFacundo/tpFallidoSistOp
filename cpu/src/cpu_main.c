@@ -4,12 +4,15 @@
 #include "cpu_main.h"
 
 int main(void) {
+
+	logger = log_create("cpu.log", "cpu", 1, LOG_LEVEL_DEBUG); //movido al mail desde abrirServerCPU
+	
 	abrirServerCPU();
     return 0;
 }
 
-int abrirServerCPU(void) {
-	logger = log_create("cpu.log", "cpu", 1, LOG_LEVEL_DEBUG);
+int abrirServerCPU() {
+	
 
 	int server_fd = iniciar_servidor();
 	log_info(logger, "Servidor listo para recibir al cliente");
