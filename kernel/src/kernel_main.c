@@ -16,16 +16,41 @@ int main(int argc, char* argv[]) {
 	char* ip;
 	char* puerto;
 	char* valor;
+	char* mensaje;
 	t_config* config;
+	t_list *handshake;
 
     logger = log_create("kernel.log", "Kernel", 1, LOG_LEVEL_DEBUG);
     //int socket_id = iniciar_servidor();
     config = iniciar_config();
-    ip = config_get_string_value(config, "IP");
+
+    ip = config_get_string_value(config, "IPIO");
     puerto = config_get_string_value(config, "PUERTO");
 	valor = config_get_string_value(config, "CLAVE");
-    //serServidorIO();
-    crearConexionCPU(conexion,ip,puerto,valor); //--logger. No es necesario ya que la variable es global
+
+	int server_fd_cpu = iniciar_servidor();
+	log_info(logger, "Servidor listo para recibir al cliente");
+	int cliente_fd_cpu = esperar_cliente(server_fd_cpu);
+	int cod_op = recibir_operacion(server_fd_cpu);
+	switch (cod_op)
+	{
+	case HANDSHAKE:
+		handshake = recibir_paquete(server_fd_cpu);
+		log_info(logger, "me llego:\n");
+		list_iterate(handshake, (void*) iterator); //no se como funciona esto 💁🏼
+		break;
+	case -1:
+			log_error(logger, "el cliente se desconecto. Terminando servidor");
+			return EXIT_FAILURE;
+	default:
+		log_warning(logger,"Operacion desconocida. No quieras meter la pata");
+		break;
+	}
+	
+	
+	// t_paquete *crear_paquete(HANDSHAKE);
+	// agregar_a_paquete(valor)
+
 	terminar_programa(conexion, logger, config); //logger: redundante (global) pero esta definido asi en utils.h
     return 0;
 }
