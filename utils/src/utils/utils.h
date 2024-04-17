@@ -28,16 +28,11 @@ Server -> Cliente:
 
 typedef enum
 {
-    HANDSHAKE
+    HANDSHAKE,
+    MENSAJE,
+    PAQUETE
 
 }protocolo_socket;
-
-
-typedef enum
-{
-	MENSAJE,
-	PAQUETE
-}op_code;
 
 typedef struct
 {
@@ -47,7 +42,7 @@ typedef struct
 
 typedef struct
 {
-	op_code codigo_operacion;
+	protocolo_socket codigo_operacion;
 	t_buffer* buffer;
 } t_paquete;
 
@@ -59,6 +54,7 @@ extern t_log* logger;
     int esperar_cliente(int);
     t_list* recibir_paquete(int);
     void recibir_mensaje(int);
+    void recibir_handshake(int);
     int recibir_operacion(int);
 
     int crear_conexion(char* ip, char* puerto, t_log * logger);
