@@ -10,5 +10,6 @@
 
 int Saludar(void);
 void iterator(char* value);
+t_config* iniciar_config(void);
 
 #endif /* MEMORIA_MAIN_H_ */

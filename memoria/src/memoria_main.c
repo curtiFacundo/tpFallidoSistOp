@@ -9,6 +9,11 @@ int Saludar(void) {
 }
 
 int main(void) {
+	int conexion;
+	char* ip;
+	char* puerto;
+	char* valor;
+	t_config* config;
 	    
 	/*
 	TO DO list:
@@ -43,7 +48,33 @@ int main(void) {
 	}
 	log_destroy(logger);
 	return EXIT_SUCCESS;
+	
+	//conexión
+	ip = config_get_string_value(config, "IP");
+    puerto = config_get_string_value(config, "PUERTO");
+	valor = config_get_string_value(config, "CLAVE");
+
+	conexion = crear_conexion(ip, puerto, logger);
+	enviar_mensaje(valor, conexion);
+	paquete(conexion);
+	//
+
+
 }
+
+t_config* iniciar_config(void)
+{
+	t_config* nuevo_config;
+
+	nuevo_config = config_create("../utils/config/memoria.config");
+
+	return nuevo_config;
+}
+
+
+
+// t_paquete *crear_paquete(HANDSHAKE);
+// agregar_a_paquete(valor);
 
 void iterator(char* value) {
 	log_info(logger,"%s", value);
