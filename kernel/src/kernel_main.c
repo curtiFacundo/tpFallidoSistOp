@@ -25,17 +25,17 @@ int main(int argc, char* argv[]) {
     config = iniciar_config();
 
     ip = config_get_string_value(config, "IPIO");
-    puerto = config_get_string_value(config, "PUERTO");
+    puerto = config_get_string_value(config, "PUERTOMEMORIA");
 	valor = config_get_string_value(config, "CLAVE");
 
-	int server_fd_cpu = iniciar_servidor();
+	int server_fd_memoria = iniciar_servidor();
 	log_info(logger, "Servidor listo para recibir al cliente");
-	int cliente_fd_cpu = esperar_cliente(server_fd_cpu);
-	int cod_op = recibir_operacion(server_fd_cpu);
+	int cliente_fd_memoria = esperar_cliente(server_fd_memoria);
+	int cod_op = recibir_operacion(server_fd_memoria);
 	switch (cod_op)
 	{
 	case HANDSHAKE:
-		handshake = recibir_paquete(server_fd_cpu);
+		handshake = recibir_paquete(server_fd_memoria);
 		log_info(logger, "me llego:\n");
 		list_iterate(handshake, (void*) iterator); //no se como funciona esto 💁🏼
 		break;
