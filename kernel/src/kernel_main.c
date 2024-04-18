@@ -18,7 +18,7 @@ int main(int argc, char* argv[]) {
 	char* mensaje;
 	t_config* config;
 	t_list *handshake;
-	t_paquete* send_handshake;
+	t_paquete* send_handshake_io;
 
     logger = log_create("kernel.log", "Kernel", 1, LOG_LEVEL_DEBUG);
     //int socket_id = iniciar_servidor();
@@ -59,11 +59,12 @@ int main(int argc, char* argv[]) {
 	valorEntradaSalida = config_get_string_value(config, "CLAVE");
 
 	conexionEntradaSalida = crear_conexion(ipEntradaSalida, puertoEntradaSalida, logger);
-	send_handshake = crear_paquete(HANDSHAKE);
+	send_handshake_io = crear_paquete(HANDSHAKE);
 
-	agregar_a_paquete (send_handshake, valorEntradaSalida, strlen(valor)+1);
-	enviar_paquete(send_handshake, conexionEntradaSalida);
-	eliminar_paquete(send_handshake);
+	agregar_a_paquete (send_handshake_io, valorEntradaSalida, strlen(valor)+1);
+	enviar_paquete(send_handshake_io, conexionEntradaSalida);
+	eliminar_paquete(send_handshake_io);
+	liberar_conexion(conexionEntradaSalida);
 	
 	
 	

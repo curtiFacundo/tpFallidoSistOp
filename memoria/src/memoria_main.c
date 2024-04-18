@@ -9,16 +9,13 @@ int Saludar(void) {
 }
 
 int main(void) {
-	int conexionKernel;
-	int conexionCpu;
-	char* ipKernel;
-	char* ipCPU;
-	char* puertoKernel;
-	char* puertoCPU;
+	int conexionKernel, conexionCpu, conexionIO ;
+	char* ipKernel, *ipCPU, *ipIO;
+	char* puertoKernel, *puertoCPU, *puertoIO;
+
 	char* valor;
 	t_config* config;
-	t_paquete* paquete_handshake_kernel;
-	t_paquete* paquete_handshake_cpu;
+	t_paquete* paquete_handshake_kernel, *paquete_handshake_cpu, *paquete_handshake_io;
 	    
 	/*
 	TO DO list:
@@ -53,9 +50,19 @@ int main(void) {
 
 	enviar_paquete(paquete_handshake_cpu, conexionCpu);
 	eliminar_paquete(paquete_handshake_cpu);
+	liberar_conexion(conexionCpu);
 	//-- FINALIZA CLIENTE PARA CPU
 
-}
+	//-- COMIENZA CLIENTE PARA IO
+	paquete_handshake_io = crear_paquete(HANDSHAKE);
+	agregar_a_paquete (paquete_handshake_io, valor, strlen(valor)+1);
+	ipIO = config_get_string_value(config, "IPIO");
+    puertoIO = config_get_string_value(config, "PUERTOIO");
 
-// t_paquete *crear_paquete(HANDSHAKE);
-// agregar_a_paquete(valor);
+	conexionIO = crear_conexion(ipIO, puertoIO, logger);
+
+	enviar_paquete(paquete_handshake_io, conexionIO);
+	eliminar_paquete(paquete_handshake_io);
+	liberar_conexion(conexionIO);
+	//-- FINALIZA CLIENTE PARA IO
+}
