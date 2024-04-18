@@ -10,7 +10,7 @@
 
 #include "../../utils/src/utils/utils.h"
 
-int main(void);
+
 
 
 #endif /* MEMORIA_MAIN_H_ */

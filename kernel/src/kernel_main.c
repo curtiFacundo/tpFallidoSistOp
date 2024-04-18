@@ -11,23 +11,26 @@ int main(int argc, char* argv[]) {
 	* iniciar_config(): Mover a utils.c
 	* serServidorIO(): generalizar? hasta que tengamos hilos, atajar las operaciones una por una
 	*/
-
-	char* ip;
-	char* puerto;
-	char* valor;
+	int conexionEntradaSalida;
+	char* ip, ipEntradaSalida;
+	char* puerto, puertoEntradaSalida;
+	char* valor, valorEntradaSalida;
 	char* mensaje;
 	t_config* config;
 	t_list *handshake;
+	t_paquete* save_handshake;
 
     logger = log_create("kernel.log", "Kernel", 1, LOG_LEVEL_DEBUG);
     //int socket_id = iniciar_servidor();
     config = config_create("../utils/config/kernel.config");
 
-    ip = config_get_string_value(config, "IPIO");
+	//Config para cliente Memoria
+    ip = config_get_string_value(config, "IP");
     puerto = config_get_string_value(config, "PUERTOMEMORIA");
 	valor = config_get_string_value(config, "CLAVE");
+	
 
-	int server_fd_memoria = iniciar_servidor();
+	int server_fd_memoria = iniciar_servidor(puerto);
 	log_info(logger, "Servidor listo para recibir al cliente");
 	int cliente_fd_memoria = esperar_cliente(server_fd_memoria);
 	int cod_op = recibir_operacion(server_fd_memoria);
@@ -51,5 +54,21 @@ int main(int argc, char* argv[]) {
 	// agregar_a_paquete(valor)
 
 	terminar_programa(server_fd_memoria, logger, config); //logger: redundante (global) pero esta definido asi en utils.h
-    return 0;
+    
+	//Config para conexion con EntradaSalida
+	ipEntradaSalida = config_get_string_value(config, "IPIO");
+    puertoEntradaSalida = config_get_string_value(config, "PUERTOIO");
+	valorEntradaSalida = config_get_string_value(config, "CLAVE");
+
+	conexionEntradaSalida = crear_conexion(ip, puerto, logger);
+	save_handshake = crear_paquete(HANDSHAKE);
+
+	agregar_a_paquete (save_handshake, valor, strlen(valor)+1);
+	enviar_paquete(save_handshake, conexionEntradaSalida);
+	eliminar_paquete(save_handshake);
+	
+	
+	
+	
+	return 0;
 }
