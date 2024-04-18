@@ -18,7 +18,7 @@ int main(int argc, char* argv[]) {
 	char* mensaje;
 	t_config* config;
 	t_list *handshake;
-	t_paquete* save_handshake;
+	t_paquete* send_handshake;
 
     logger = log_create("kernel.log", "Kernel", 1, LOG_LEVEL_DEBUG);
     //int socket_id = iniciar_servidor();
@@ -33,11 +33,11 @@ int main(int argc, char* argv[]) {
 	int server_fd_memoria = iniciar_servidor(puerto);
 	log_info(logger, "Servidor listo para recibir al cliente");
 	int cliente_fd_memoria = esperar_cliente(server_fd_memoria);
-	int cod_op = recibir_operacion(server_fd_memoria);
+	int cod_op = recibir_operacion(cliente_fd_memoria);
 	switch (cod_op)
 	{
 	case HANDSHAKE:
-		handshake = recibir_paquete(server_fd_memoria);
+		handshake = recibir_paquete(cliente_fd_memoria);
 		log_info(logger, "me llego:\n");
 		list_iterate(handshake, (void*) iterator); //no se como funciona esto 💁🏼
 		break;
@@ -48,12 +48,10 @@ int main(int argc, char* argv[]) {
 		log_warning(logger,"Operacion desconocida. No quieras meter la pata");
 		break;
 	}
-	
-	
-	// t_paquete *crear_paquete(HANDSHAKE);
-	// agregar_a_paquete(valor)
+	close(server_fd_memoria);
+	close(cliente_fd_memoria);
 
-	terminar_programa(server_fd_memoria, logger, config); //logger: redundante (global) pero esta definido asi en utils.h
+	//terminar_programa(server_fd_memoria, logger, config); //logger: redundante (global) pero esta definido asi en utils.h
     
 	//Config para conexion con EntradaSalida
 	ipEntradaSalida = config_get_string_value(config, "IPIO");
@@ -61,11 +59,11 @@ int main(int argc, char* argv[]) {
 	valorEntradaSalida = config_get_string_value(config, "CLAVE");
 
 	conexionEntradaSalida = crear_conexion(ip, puerto, logger);
-	save_handshake = crear_paquete(HANDSHAKE);
+	send_handshake = crear_paquete(HANDSHAKE);
 
-	agregar_a_paquete (save_handshake, valor, strlen(valor)+1);
-	enviar_paquete(save_handshake, conexionEntradaSalida);
-	eliminar_paquete(save_handshake);
+	agregar_a_paquete (send_handshake, valor, strlen(valor)+1);
+	enviar_paquete(send_handshake, conexionEntradaSalida);
+	eliminar_paquete(send_handshake);
 	
 	
 	
