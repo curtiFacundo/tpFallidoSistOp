@@ -10,14 +10,7 @@
 
 #include "../../utils/src/utils/utils.h"
 
-
-t_log* iniciar_logger(void);
-t_config* iniciar_config(void);
-void leer_consola(t_log*);
-void paquete(int);
-void terminar_programa(int, t_log*, t_config*);
-int crearConexionKernel(t_log* logger,int conexion,char* ip, char* puerto,char* valor);
-void iterator(char* value);
+int main(void);
 
 
 #endif /* MEMORIA_MAIN_H_ */
