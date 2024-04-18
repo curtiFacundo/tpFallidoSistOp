@@ -28,11 +28,11 @@ int main(void) {
 	int server_fd_memoria = iniciar_servidor(puerto);
 	log_info(logger, "Servidor CPU listo para recibir al cliente MEMORIA");
 	int cliente_fd_memoria = esperar_cliente(server_fd_memoria);
-	int cod_op = recibir_operacion(server_fd_memoria);
+	int cod_op = recibir_operacion(cliente_fd_memoria);
 	switch (cod_op)
 	{
 	case HANDSHAKE:
-		handshake = recibir_paquete(server_fd_memoria);
+		handshake = recibir_paquete(cliente_fd_memoria);
 		log_info(logger, "me llego:\n");
 		list_iterate(handshake, (void*) iterator); //no se como funciona esto 💁🏼
 		break;

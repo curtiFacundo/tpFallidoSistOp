@@ -51,8 +51,8 @@ int main(void) {
 
 	conexionCpu = crear_conexion(ipCPU, puertoCPU, logger);
 
-	enviar_paquete(paquete_handshake_kernel, conexionCpu);
-	eliminar_paquete(paquete_handshake_kernel);
+	enviar_paquete(paquete_handshake_cpu, conexionCpu);
+	eliminar_paquete(paquete_handshake_cpu);
 	//-- FINALIZA CLIENTE PARA CPU
 
 }
