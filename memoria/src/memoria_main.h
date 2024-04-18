@@ -9,7 +9,6 @@
 #include "../../utils/src/utils/utils.h"
 
 int Saludar(void);
-void iterator(char* value);
-t_config* iniciar_config(void);
+int main(void);
 
 #endif /* MEMORIA_MAIN_H_ */

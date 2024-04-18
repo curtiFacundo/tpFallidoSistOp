@@ -9,7 +9,8 @@ int Saludar(void) {
 }
 
 int main(void) {
-	int conexion;
+	int conexionKernel;
+	int conexionCpu;
 	char* ip;
 	char* puerto;
 	char* valor;
@@ -22,18 +23,18 @@ int main(void) {
 	*/
 
 	logger = log_create("memoria.log", "memoria", 1, LOG_LEVEL_DEBUG);
-	config = iniciar_config();
+	config = config_create("../utils/config/memoria.config");
 	//conexión
 
 	ip = config_get_string_value(config, "IPKERNEL");
     puerto = config_get_string_value(config, "PUERTOKERNEL");
 	valor = config_get_string_value(config, "CLAVE");
 
-	conexion = crear_conexion(ip, puerto, logger);
+	conexionKernel = crear_conexion(ip, puerto, logger);
 	save_handshake = crear_paquete(HANDSHAKE);
 
 	agregar_a_paquete (save_handshake, valor, strlen(valor)+1);
-	enviar_paquete(save_handshake, conexion);
+	enviar_paquete(save_handshake, conexionKernel);
 	eliminar_paquete(save_handshake);
 
 	//
@@ -41,20 +42,5 @@ int main(void) {
 
 }
 
-t_config* iniciar_config(void)
-{
-	t_config* nuevo_config;
-
-	nuevo_config = config_create("../utils/config/memoria.config");
-
-	return nuevo_config;
-}
-
-
-
 // t_paquete *crear_paquete(HANDSHAKE);
 // agregar_a_paquete(valor);
-
-void iterator(char* value) {
-	log_info(logger,"%s", value);
-}

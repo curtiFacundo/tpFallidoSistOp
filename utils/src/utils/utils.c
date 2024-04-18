@@ -235,3 +235,7 @@ void terminar_programa(int conexion, t_log* logger, t_config* config)
 	config_destroy(config);
 
 }
+
+void iterator(char* value) {
+	log_info(logger,"%s", value);
+}
