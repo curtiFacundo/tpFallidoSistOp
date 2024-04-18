@@ -12,9 +12,9 @@ int main(int argc, char* argv[]) {
 	* serServidorIO(): generalizar? hasta que tengamos hilos, atajar las operaciones una por una
 	*/
 	int conexionEntradaSalida;
-	char* ip, ipEntradaSalida;
-	char* puerto, puertoEntradaSalida;
-	char* valor, valorEntradaSalida;
+	char* ip, *ipEntradaSalida;
+	char* puerto, *puertoEntradaSalida;
+	char* valor, *valorEntradaSalida;
 	char* mensaje;
 	t_config* config;
 	t_list *handshake;
@@ -58,10 +58,10 @@ int main(int argc, char* argv[]) {
     puertoEntradaSalida = config_get_string_value(config, "PUERTOIO");
 	valorEntradaSalida = config_get_string_value(config, "CLAVE");
 
-	conexionEntradaSalida = crear_conexion(ip, puerto, logger);
+	conexionEntradaSalida = crear_conexion(ipEntradaSalida, puertoEntradaSalida, logger);
 	send_handshake = crear_paquete(HANDSHAKE);
 
-	agregar_a_paquete (send_handshake, valor, strlen(valor)+1);
+	agregar_a_paquete (send_handshake, valorEntradaSalida, strlen(valor)+1);
 	enviar_paquete(send_handshake, conexionEntradaSalida);
 	eliminar_paquete(send_handshake);
 	

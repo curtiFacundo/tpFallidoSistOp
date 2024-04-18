@@ -24,14 +24,14 @@ int main(int argc, char* argv[]) {
     puerto = config_get_string_value(config, "PUERTOKERNEL");
 	valor = config_get_string_value(config, "CLAVE");
     
-    int server_fd_kernel = iniciar_servidor();
+    int server_fd_kernel = iniciar_servidor(puerto);
 	log_info(logger, "Servidor I/O listo para recibir al cliente Kernel");
 	int cliente_fd_kernel = esperar_cliente(server_fd_kernel);
-	int cod_op = recibir_operacion(server_fd_kernel);
+	int cod_op = recibir_operacion(cliente_fd_kernel);
 	switch (cod_op)
 	{
 	case HANDSHAKE:
-		handshake = recibir_paquete(server_fd_kernel);
+		handshake = recibir_paquete(cliente_fd_kernel);
 		log_info(logger, "me llego:\n");
 		list_iterate(handshake, (void*) iterator); //no se como funciona esto 💁🏼
 		break;
@@ -48,6 +48,7 @@ int main(int argc, char* argv[]) {
 	// agregar_a_paquete(valor)
 
 	terminar_programa(server_fd_kernel, logger, config); //logger: redundante (global) pero esta definido asi en utils.h
+	close(cliente_fd_kernel);
     return 0;
 }
 
