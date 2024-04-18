@@ -15,8 +15,6 @@
 #include <unistd.h>
 #include <sys/socket.h>
 
-#define PUERTO "4444" //ojo -> Hardcodeado. 
-
 /* Orden de conexiones:
 Server -> Cliente:
 * Kernel -> CPU
@@ -50,7 +48,7 @@ extern t_log* logger;
 
 //socket
     void* recibir_buffer(int*, int);
-    int iniciar_servidor(void);
+    int iniciar_servidor(char *puerto);
     int esperar_cliente(int);
     t_list* recibir_paquete(int);
     void recibir_mensaje(int);
