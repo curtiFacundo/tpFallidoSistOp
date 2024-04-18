@@ -25,7 +25,7 @@ int main(void) {
     puerto = config_get_string_value(config, "PUERTOMEMORIA");
 	valor = config_get_string_value(config, "CLAVE");
 
-	int server_fd_memoria = iniciar_servidor();
+	int server_fd_memoria = iniciar_servidor(puerto);
 	log_info(logger, "Servidor CPU listo para recibir al cliente MEMORIA");
 	int cliente_fd_memoria = esperar_cliente(server_fd_memoria);
 	int cod_op = recibir_operacion(server_fd_memoria);

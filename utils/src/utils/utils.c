@@ -10,7 +10,7 @@ void decir_hola(char* quien) {
 }
 
 //socket
-    int iniciar_servidor(void)
+    int iniciar_servidor(char *puerto)
     {
         int socket_servidor;
 
@@ -21,7 +21,7 @@ void decir_hola(char* quien) {
         hints.ai_socktype = SOCK_STREAM;
         hints.ai_flags = AI_PASSIVE;
 
-        getaddrinfo(NULL, PUERTO, &hints, &servinfo);
+        getaddrinfo(NULL, puerto, &hints, &servinfo);
 
         socket_servidor = socket(
             servinfo->ai_family,
