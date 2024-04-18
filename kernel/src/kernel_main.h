@@ -14,9 +14,5 @@
 t_log* iniciar_logger(void);
 t_config* iniciar_config(void);
 void paquete(int);
-void terminar_programa(int, t_log*, t_config*);
-int crearConexionCPU(int conexion,char* ip, char* puerto,char* valor); //--logger. No es necesario ya que la variable es global
-int serServidorIO(void);
-void iterator(char* value);
 
 #endif /* KERNEL_MAIN_H_ */

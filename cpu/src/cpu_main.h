@@ -9,7 +9,5 @@
 #include "../../utils/src/utils/utils.h"
 
 int main(void);
-int abrirServerCPU(void);
-void iterator(char* value);
 
 #endif /* CPU_MAIN_H_ */

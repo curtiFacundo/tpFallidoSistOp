@@ -66,6 +66,8 @@ extern t_log* logger;
     void eliminar_paquete(t_paquete* paquete);
 //socket
     void leer_consola(void);
+    void iterator(char* value);
+    
 /**
 * @fn    decir_hola
 * @brief Imprime un saludo al nombre que se pase por parámetro por consola.
