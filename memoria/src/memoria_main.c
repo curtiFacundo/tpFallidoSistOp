@@ -11,8 +11,10 @@ int Saludar(void) {
 int main(void) {
 	int conexionKernel;
 	int conexionCpu;
-	char* ip;
-	char* puerto;
+	char* ipKernel;
+	char* ipCPU;
+	char* puertoKernel;
+	char* puertoCPU;
 	char* valor;
 	t_config* config;
 	t_paquete* save_handshake;
@@ -26,19 +28,30 @@ int main(void) {
 	config = config_create("../utils/config/memoria.config");
 	//conexión
 
-	ip = config_get_string_value(config, "IPKERNEL");
-    puerto = config_get_string_value(config, "PUERTOKERNEL");
 	valor = config_get_string_value(config, "CLAVE");
-
-	conexionKernel = crear_conexion(ip, puerto, logger);
 	save_handshake = crear_paquete(HANDSHAKE);
-
 	agregar_a_paquete (save_handshake, valor, strlen(valor)+1);
+
+	//-- COMIENZA CLIENTE PARA KERNEL
+	ipKernel = config_get_string_value(config, "IPKERNEL");
+    puertoKernel = config_get_string_value(config, "PUERTOKERNEL");
+
+	conexionKernel = crear_conexion(ipKernel, puertoKernel, logger);
+
 	enviar_paquete(save_handshake, conexionKernel);
 	eliminar_paquete(save_handshake);
+	liberar_conexion(conexionKernel);
+	//-- FINALIZA CLIENTE PARA KERNEL
 
-	//
+	//-- COMIENZA CLIENTE PARA CPU
+	ipCPU = config_get_string_value(config, "IPCPU");
+    puertoCPU = config_get_string_value(config, "PUERTOCPU");
 
+	conexionCpu = crear_conexion(ipCPU, puertoCPU, logger);
+
+	enviar_paquete(save_handshake, conexionCpu);
+	eliminar_paquete(save_handshake);
+	//-- FINALIZA CLIENTE PARA CPU
 
 }
 
