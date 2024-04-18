@@ -207,7 +207,7 @@ void decir_hola(char* quien) {
     }
 //socket
 
-void leer_consola(t_log* logger)
+void leer_consola()
 {
 	char* leido;
 	while(!string_is_empty(leido = readline("> "))){
@@ -219,7 +219,7 @@ void leer_consola(t_log* logger)
 void paquete(int conexion)
 {
 	char* leido;
-	t_paquete* paquete = crear_paquete();
+	t_paquete* paquete = crear_paquete(PAQUETE);
 	while(!string_is_empty(leido = readline("> "))){
 		agregar_a_paquete(paquete, leido, strlen(leido)+1);
 	}

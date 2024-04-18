@@ -59,13 +59,13 @@ extern t_log* logger;
 
     int crear_conexion(char* ip, char* puerto, t_log * logger);
     void enviar_mensaje(char* mensaje, int socket_cliente);
-    t_paquete* crear_paquete(void);
+    t_paquete* crear_paquete(protocolo_socket cod_op); 
     void agregar_a_paquete(t_paquete* paquete, void* valor, int tamanio);
     void enviar_paquete(t_paquete* paquete, int socket_cliente);
     void liberar_conexion(int socket_cliente);
     void eliminar_paquete(t_paquete* paquete);
 //socket
-
+    void leer_consola(void);
 /**
 * @fn    decir_hola
 * @brief Imprime un saludo al nombre que se pase por parámetro por consola.
