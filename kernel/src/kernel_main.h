@@ -14,5 +14,6 @@
 t_log* iniciar_logger(void);
 t_config* iniciar_config(void);
 void paquete(int);
+void EscucharServidor(char*,char*);
 
 #endif /* KERNEL_MAIN_H_ */

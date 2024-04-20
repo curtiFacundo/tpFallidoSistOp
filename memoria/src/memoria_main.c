@@ -58,9 +58,8 @@ int main(void) {
 	agregar_a_paquete (paquete_handshake_io, valor, strlen(valor)+1);
 	ipIO = config_get_string_value(config, "IPIO");
     puertoIO = config_get_string_value(config, "PUERTOIO");
-
 	conexionIO = crear_conexion(ipIO, puertoIO, logger);
-
+	
 	enviar_paquete(paquete_handshake_io, conexionIO);
 	eliminar_paquete(paquete_handshake_io);
 	liberar_conexion(conexionIO);

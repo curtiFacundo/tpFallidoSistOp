@@ -2,19 +2,19 @@
 #include <stdio.h>
 #include "entradasalida_main.h"
 
+t_config* config;
+t_list *handshake;
+t_paquete* send_handshake_Kernel;
 int main(int argc, char* argv[]) {
         
 	/*
 	TO DO list:
-	
 	*/
     
 	char* ip;
 	char* puerto;
 	char* valor;
 	char* mensaje;
-	t_config* config;
-	t_list *handshake;
 
     logger = log_create("entradasalida.log", "entradasalida", 1, LOG_LEVEL_DEBUG);
     //int socket_id = iniciar_servidor();
