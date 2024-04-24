@@ -11,10 +11,11 @@ int main(int argc, char* argv[]) {
 	TO DO list:
 	*/
     
-	char* ip;
-	char* puerto;
+	char* ip, *ip_memoria;
+	char* puerto, *puerto_memoria;
 	char* valor;
 	char* mensaje;
+
 
     logger = log_create("entradasalida.log", "entradasalida", 1, LOG_LEVEL_DEBUG);
     //int socket_id = iniciar_servidor();
@@ -46,11 +47,10 @@ int main(int argc, char* argv[]) {
 	// FIN SERVER KERNEL
 
     // SERVER MEMORIA
-    ip = config_get_string_value(config, "IPMEMORIA");
-    puerto = config_get_string_value(config, "PUERTOMEMORIA");
-	valor = config_get_string_value(config, "CLAVE");
+    ip_memoria = config_get_string_value(config, "IPMEMORIA");
+    puerto_memoria = config_get_string_value(config, "PUERTOMEMORIA");
     
-    int server_fd_memoria = iniciar_servidor(puerto);
+    int server_fd_memoria = iniciar_servidor(puerto_memoria);
 	log_info(logger, "Servidor I/O listo para recibir al cliente Memoria");
 	int cliente_fd_memoria = esperar_cliente(server_fd_memoria);
 	cod_op = recibir_operacion(cliente_fd_memoria);

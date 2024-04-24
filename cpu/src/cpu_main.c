@@ -55,7 +55,7 @@ int main(void) {
 	conexionKernel = crear_conexion(ipKernel, puertoKernel, logger);
 	send_handshake_Kernel = crear_paquete(HANDSHAKE);
 
-	agregar_a_paquete(send_handshake_Kernel, valorKernel, strlen(valor)+1);
+	agregar_a_paquete(send_handshake_Kernel, valorKernel, strlen(valorKernel)+1);
 	enviar_paquete(send_handshake_Kernel, conexionKernel);
 	eliminar_paquete(send_handshake_Kernel);
 	liberar_conexion(conexionKernel);
