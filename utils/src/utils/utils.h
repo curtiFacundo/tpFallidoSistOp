@@ -62,6 +62,7 @@ extern t_log* logger;
     void enviar_paquete(t_paquete* paquete, int socket_cliente);
     void liberar_conexion(int socket_cliente);
     void eliminar_paquete(t_paquete* paquete);
+    void terminar_programa(int conexion, t_log* logger, t_config* config);
 //socket
     void leer_consola(void);
     void iterator(char* value);
