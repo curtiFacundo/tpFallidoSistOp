@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include "kernel_main.h"
 
-t_config* config;
+t_config* config_global;
 t_list *handshake;
 t_paquete* send_handshake_io;
 
@@ -15,42 +15,42 @@ int main(int argc, char* argv[])
 	* iniciar_config(): Mover a utils.c
 	* serServidorIO(): generalizar? hasta que tengamos hilos, atajar las operaciones una por una
 	*/
-	int conexionEntradaSalida;
-	char* ip, *ipEntradaSalida;
-	char* puerto, *puertoEntradaSalida;
-	char* valor, *valorEntradaSalida;
+	int conexion_IO_KERNEL;
+	char* ip_MEMORIA, *ip_IO;
+	char* puerto, *puerto_IO_KERNEL;
+	char* valor_MEMORIA, *valor_IO;
 	char* mensaje;
 
 
     logger = log_create("kernel.log", "Kernel", 1, LOG_LEVEL_DEBUG);
     //int socket_id = iniciar_servidor();
-    config = config_create("../utils/config/kernel.config");
+    config_global = config_create("../utils/config/config_global.config");
 
-	//Config para cliente Memoria
-	ip = config_get_string_value(config, "IP");
-    puerto = config_get_string_value(config, "PUERTOMEMORIA");
-	valor = config_get_string_value(config, "CLAVE");
+	//Config para cliente Memoria. KERNEL->MEMORIA
+	ip_MEMORIA = config_get_string_value(config_global, "IP_MEMORIA");
+    puerto = config_get_string_value(config_global, "PUERTO_KERNEL->MEMORIA");
+	valor_MEMORIA = config_get_string_value(config_global, "CLAVE_KERNEL"); //Decia CLAVE.
 	EscucharServidor(puerto, "memoria");
 	
-	//Config para cliente CPU
-	ip = config_get_string_value(config, "IPCPU");
-    puerto = config_get_string_value(config, "PUERTOCPU");
-	EscucharServidor(puerto, "CPU");
+	//Config para cliente CPU. KERNEL->CPU
+	ip_MEMORIA = config_get_string_value(config_global, "IP_CPU");
+    puerto = config_get_string_value(config_global, "PUERTO_KERNEL->CPU");
+	EscucharServidor(puerto, "cpu");
 
-	//terminar_programa(server_fd_memoria, logger, config); //logger: redundante (global) pero esta definido asi en utils.h
+	//terminar_programa(server_fd_memoria, logger, config_global); //logger: redundante (global) pero esta definido asi en utils.h
     
-	//Config para conexion con EntradaSalida
-	ipEntradaSalida = config_get_string_value(config, "IPIO");
-    puertoEntradaSalida = config_get_string_value(config, "PUERTOIO");
-	valorEntradaSalida = config_get_string_value(config, "CLAVE");
+	//Config para conexion con EntradaSalida. IO->KERNEL
+	ip_IO = config_get_string_value(config_global, "IP_IO");
+    puerto_IO_KERNEL = config_get_string_value(config_global, "PUERTO_IO->KERNEL");
+	valor_IO = config_get_string_value(config_global, "CLAVE_KERNEL"); //Decia CLAVE.
 
-	conexionEntradaSalida = crear_conexion(ipEntradaSalida, puertoEntradaSalida, logger);
+	conexion_IO_KERNEL = crear_conexion(ip_IO, puerto_IO_KERNEL, logger);
 	send_handshake_io = crear_paquete(HANDSHAKE);
 
-	agregar_a_paquete (send_handshake_io, valorEntradaSalida, strlen(valorEntradaSalida)+1);
-	enviar_paquete(send_handshake_io, conexionEntradaSalida);
+	agregar_a_paquete (send_handshake_io, valor_IO, strlen(valor_IO)+1);
+	enviar_paquete(send_handshake_io, conexion_IO_KERNEL);
 	eliminar_paquete(send_handshake_io);
-	liberar_conexion(conexionEntradaSalida);
+	liberar_conexion(conexion_IO_KERNEL);
 	
 	return 0;
 }
