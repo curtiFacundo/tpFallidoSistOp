@@ -47,7 +47,7 @@ int main(int argc, char* argv[])
 	conexionEntradaSalida = crear_conexion(ipEntradaSalida, puertoEntradaSalida, logger);
 	send_handshake_io = crear_paquete(HANDSHAKE);
 
-	agregar_a_paquete (send_handshake_io, valorEntradaSalida, strlen(valor)+1);
+	agregar_a_paquete (send_handshake_io, valorEntradaSalida, strlen(valorEntradaSalida)+1);
 	enviar_paquete(send_handshake_io, conexionEntradaSalida);
 	eliminar_paquete(send_handshake_io);
 	liberar_conexion(conexionEntradaSalida);
