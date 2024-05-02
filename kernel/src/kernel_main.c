@@ -78,3 +78,31 @@ void EscucharServidor(char* puerto, char* CLIENTE)
 		}
 	close(server);
 }
+void conexion_cpu(char* puerto, char* CLIENTE) 
+{
+	int server = iniciar_servidor(puerto);
+		log_info(logger, "Servidor listo para recibir al cliente");
+		log_info(logger, CLIENTE);
+		int cliente = esperar_cliente(server);
+		while(true){
+			int cod_op = recibir_operacion(cliente);
+			switch (cod_op)
+			{
+				case HANDSHAKE:
+					handshake = recibir_paquete(cliente);
+					log_info(logger, "me llego:\n");
+					list_iterate(handshake, (void*) iterator); //no se como funciona esto 💁🏼
+					break;
+				case -1:
+						//log_error(logger, "el cliente se desconecto. Terminando servidor");
+						//return EXIT_FAILURE;
+						break;
+				default:
+					log_warning(logger,"Operacion desconocida. No quieras meter la pata");
+					break;
+			}
+		}
+		
+	close(server);
+	close(cliente);
+}

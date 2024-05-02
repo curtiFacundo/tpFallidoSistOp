@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "cpu_main.h"
 
+
 int main(void) {
     
 	/*
@@ -16,7 +17,6 @@ int main(void) {
 	char* valor,*valor_KERNEL;
 	char* mensaje;
 	int conexion_KERNEL_CPU;
-	t_config* config_global;
 	t_list *handshake;
 	t_paquete* send_handshake_Kernel;
 	
