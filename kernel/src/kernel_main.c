@@ -15,6 +15,7 @@ int main(int argc, char* argv[])
 	* iniciar_config(): Mover a utils.c
 	* serServidorIO(): generalizar? hasta que tengamos hilos, atajar las operaciones una por una
 	*/
+	
 	int conexionEntradaSalida;
 	char* ip, *ipEntradaSalida;
 	char* puerto, *puertoEntradaSalida;
