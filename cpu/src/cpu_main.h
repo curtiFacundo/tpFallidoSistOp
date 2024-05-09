@@ -8,6 +8,7 @@
 
 #include "../../utils/src/utils/utils.h"
 
-int main(void);
+void cliente_conexion_KERNEL(char *, char *);
+void conexion_memoria(char*);
 
 #endif /* CPU_MAIN_H_ */

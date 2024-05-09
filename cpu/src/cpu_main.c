@@ -67,5 +67,63 @@ int main(void) {
 	terminar_programa(server_fd_memoria, logger, config_global); //logger: redundante (global) pero esta definido asi en utils.h
     return 0;
 }
+void cliente_conexion_KERNEL(char * puerto, char * ip){
+	t_paquete* send_handshake;
+	int conexion;
+	protocolo_socket op;
+	int flag=1;
 
+	conexion = crear_conexion(ip, puerto);
+	send_handshake = crear_paquete(HANDSHAKE);
+	agregar_a_paquete (send_handshake, "hola soy CPU", 12+1);
+
+	while(flag){
+		enviar_paquete(send_handshake, conexion);
+		sleep(1);
+		op = recibir_operacion(conexion);
+		switch (op)
+		{
+		case HANDSHAKE:
+			log_info("recibi handshake de KERNEL");
+			break;
+		
+		case TERMINATE:
+			flag = 0;
+			break;
+
+		default:
+			break;
+		}
+	}
+
+	eliminar_paquete(send_handshake);
+	liberar_conexion(conexion);
+}
+void conexion_memoria(char* puerto) 
+{
+	int server = iniciar_servidor(puerto);
+		log_info(logger, "Servidor listo para recibir al cliente Memoria");
+		int cliente = esperar_cliente(server);
+		while(true){
+			int cod_op = recibir_operacion(cliente);
+			switch (cod_op)
+			{
+				case HANDSHAKE:
+					handshake = recibir_paquete(cliente);
+					log_info(logger, "me llego:\n");
+					list_iterate(handshake, (void*) iterator); //no se como funciona esto 💁🏼
+					break;
+				case -1:
+					log_error(logger, "el cliente se desconecto. Terminando servidor");
+					return EXIT_FAILURE;
+					break;
+				default:
+					log_warning(logger,"Operacion desconocida. No quieras meter la pata");
+					break;
+			}
+		}
+		
+	close(server);
+	close(cliente);
+}
 

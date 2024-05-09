@@ -29,7 +29,8 @@ typedef enum
 {
     HANDSHAKE,
     MENSAJE,
-    PAQUETE
+    PAQUETE,
+    TERMINATE
 
 }protocolo_socket;
 

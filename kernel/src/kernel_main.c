@@ -3,8 +3,7 @@
 #include "kernel_main.h"
 
 t_config* config_global;
-t_list *handshake;
-t_paquete* send_handshake_io;
+
 
 int main(int argc, char* argv[]) 
 {    
@@ -55,34 +54,63 @@ int main(int argc, char* argv[])
 	return 0;
 }
 
-void EscucharServidor(char* puerto, char* CLIENTE) 
+// void EscucharServidor(char* puerto, char* CLIENTE) 
+// {
+// 	int server = iniciar_servidor(puerto);
+// 		log_info(logger, "Servidor listo para recibir al cliente");
+// 		log_info(logger, CLIENTE);
+// 		int cliente = esperar_cliente(server);
+// 		int cod_op = recibir_operacion(cliente);
+// 		switch (cod_op)
+// 		{
+// 		case HANDSHAKE:
+// 			handshake = recibir_paquete(cliente);
+// 			log_info(logger, "me llego:\n");
+// 			list_iterate(handshake, (void*) iterator); //no se como funciona esto 💁🏼
+// 			break;
+// 		case -1:
+// 				log_error(logger, "el cliente se desconecto. Terminando servidor");
+// 				return EXIT_FAILURE;
+// 		default:
+// 			log_warning(logger,"Operacion desconocida. No quieras meter la pata");
+// 			break;
+// 		}
+// 	close(server);
+// }
+void conexion_cpu(char* puerto)
 {
+	t_list *handshake;
+
 	int server = iniciar_servidor(puerto);
-		log_info(logger, "Servidor listo para recibir al cliente");
-		log_info(logger, CLIENTE);
+		log_info(logger, "Servidor listo para recibir al cliente CPU");
 		int cliente = esperar_cliente(server);
-		int cod_op = recibir_operacion(cliente);
-		switch (cod_op)
-		{
-		case HANDSHAKE:
-			handshake = recibir_paquete(cliente);
-			log_info(logger, "me llego:\n");
-			list_iterate(handshake, (void*) iterator); //no se como funciona esto 💁🏼
-			break;
-		case -1:
-				log_error(logger, "el cliente se desconecto. Terminando servidor");
-				return EXIT_FAILURE;
-		default:
-			log_warning(logger,"Operacion desconocida. No quieras meter la pata");
-			break;
+		while(true){
+			int cod_op = recibir_operacion(cliente);
+			switch (cod_op)d
+			{
+				case HANDSHAKE:
+					handshake = recibir_paquete(cliente);
+					log_info(logger, "me llego:\n");
+					list_iterate(handshake, (void*) iterator); //no se como funciona esto 💁🏼
+					break;
+				case -1:
+					log_error(logger, "el cliente se desconecto. Terminando servidor");
+					return EXIT_FAILURE;
+					break;
+				default:
+					log_warning(logger,"Operacion desconocida. No quieras meter la pata");
+					break;
+			}
 		}
-	close(server);
+		
+	close(server);d
+	close(cliente);
 }
-void conexion_cpu(char* puerto, char* CLIENTE) 
+void conexion_memoria(char* puerto) 
 {
+	t_list *handshake;
 	int server = iniciar_servidor(puerto);
-		log_info(logger, "Servidor listo para recibir al cliente");
-		log_info(logger, CLIENTE);
+		log_info(logger, "Servidor listo para recibir al cliente MEMORIA");
 		int cliente = esperar_cliente(server);
 		while(true){
 			int cod_op = recibir_operacion(cliente);
@@ -105,4 +133,36 @@ void conexion_cpu(char* puerto, char* CLIENTE)
 		
 	close(server);
 	close(cliente);
+}
+void cliente_conexion_IO(char * puerto, char * ip){
+	t_paquete* send_handshake_io;
+	int conexion_IO_KERNEL;
+	protocolo_socket op;
+	int flag=1;
+
+	conexion_IO_KERNEL = crear_conexion(ip, puerto);
+	send_handshake_io = crear_paquete(HANDSHAKE);
+	agregar_a_paquete (send_handshake_io, valor_IO, strlen(valor_IO)+1);
+
+	while(flag){
+		enviar_paquete(send_handshake_io, conexion_IO_KERNEL);
+		sleep(1);
+		op = recibir_operacion(conexion_IO_KERNEL);
+		switch (op)
+		{
+		case HANDSHAKE:
+			log_info("recibi handshake de IO");
+			break;
+		
+		case TERMINATE:
+			flag = 0;
+			break;
+
+		default:
+			break;
+		}
+	}
+
+	eliminar_paquete(send_handshake_io);
+	liberar_conexion(conexion_IO_KERNEL);
 }

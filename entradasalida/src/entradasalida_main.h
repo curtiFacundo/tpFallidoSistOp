@@ -10,7 +10,8 @@
 
 #include "../../utils/src/utils/utils.h"
 
-
+void conexion_kernel(char*);
+void conexion_memoria(char*);
 
 
 #endif /* MEMORIA_MAIN_H_ */

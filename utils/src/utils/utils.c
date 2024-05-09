@@ -48,11 +48,11 @@ void decir_hola(char* quien) {
     int recibir_operacion(int socket_cliente)
     {
         int cod_op;
-        if(recv(socket_cliente, &cod_op, sizeof(int), MSG_WAITALL) > 0)
+        if(recv(socket_cliente, &cod_op, sizeof(int), MSG_WAITALL) > 0) //function block hasta que llegue un paquete
             return cod_op;
         else
         {
-            close(socket_cliente);
+            close(socket_cliente); //cierra la conexion si la conexion no existe
             return -1;
         }
     }
@@ -143,7 +143,7 @@ void decir_hola(char* quien) {
     {
         t_paquete* paquete = malloc(sizeof(t_paquete));
 
-        paquete->codigo_operacion = MENSAJE;
+        paquete->codigo_operacion = MENSAJE;config_get_string_value(config_global, "IP_CPU")
         paquete->buffer = malloc(sizeof(t_buffer));
         paquete->buffer->size = strlen(mensaje) + 1;
         paquete->buffer->stream = malloc(paquete->buffer->size);
@@ -248,7 +248,7 @@ void *thread_crear_conexion_server(void *arg) {
   switch((tipo_conexion) arg){
     case KERNEL_CPU:
         #ifdef KERNEL_MAIN_H_
-        conexion_cpu(config_get_string_value(config_global, "PUERTO_KERNEL->CPU"), "CPU");
+        conexion_cpu(config_get_string_value(config_global, "PUERTO_KERNEL->CPU"));
         strcpy(ret, "Se finalizo el thread conexion Kernel_CPU");
         #endif
         pthread_exit(ret);
@@ -256,7 +256,7 @@ void *thread_crear_conexion_server(void *arg) {
     
     case KERNEL_MEMORIA:
         #ifdef KERNEL_MAIN_H_
-        conexion_memoria(config_get_string_value(config_global, "PUERTO_KERNEL->MEMORIA"), "MEMORIA");
+        conexion_memoria(config_get_string_value(config_global, "PUERTO_KERNEL->MEMORIA"));
         strcpy(ret, "Se finalizo el thread conexion Kernel_MEMORIA");
         #endif
         pthread_exit(ret);
@@ -264,7 +264,7 @@ void *thread_crear_conexion_server(void *arg) {
 
     case CPU_MEMORIA:
         #ifdef CPU_MAIN_H_
-        conexion_memoria(config_get_string_value(config_global, "PUERTO_CPU->MEMORIA"), "MEMORIA");
+        conexion_memoria(config_get_string_value(config_global, "PUERTO_CPU->MEMORIA"));
         strcpy(ret, "Se finalizo el thread conexion CPU_MEMORIA");
         #endif
         pthread_exit(ret);
@@ -272,7 +272,7 @@ void *thread_crear_conexion_server(void *arg) {
 
     case IO_KERNEL:
         #ifdef IO_MAIN_H_
-        conexion_kernel(config_get_string_value(config_global, "PUERTO_IO->KERNEL"), "KERNEL");
+        conexion_kernel(config_get_string_value(config_global, "PUERTO_IO->KERNEL"));
         strcpy(ret, "Se finalizo el thread conexion IO->KERNEL");
         #endif
         pthread_exit(ret);
@@ -280,7 +280,7 @@ void *thread_crear_conexion_server(void *arg) {
 
     case IO_MEMORIA:
         #ifdef IO_MAIN_H_
-        conexion_kernel(config_get_string_value(config_global, "PUERTO_IO->MEMORIA"), "MEMORIA");
+        conexion_memoria(config_get_string_value(config_global, "PUERTO_IO->MEMORIA"));
         strcpy(ret, "Se finalizo el thread conexion IO->MEMORIA");
         #endif
         pthread_exit(ret);
@@ -297,7 +297,10 @@ void *thread_crear_conexion_client(void *arg) {
   switch((tipo_conexion) arg){
     case KERNEL_CPU:
         #ifdef CPU_MAIN_H_
-        conexion_kernel(config_get_string_value(config_global, "IP_KERNEL"), config_get_string_value(config_global, "PUERTO_KERNEL->CPU"));
+        cliente_conexion_KERNEL(
+                config_get_string_value(config_global, "PUERTO_KERNEL->CPU"),
+                config_get_string_value(config_global, "IP_KERNEL"));
+
         strcpy(ret, "Se finalizo el thread conexion Kernel_CPU");
         #endif
         pthread_exit(ret);
@@ -305,7 +308,10 @@ void *thread_crear_conexion_client(void *arg) {
     
     case KERNEL_MEMORIA:
         #ifdef MEMORIA_MAIN_H_
-        conexion_kernel(config_get_string_value(config_global, "IP_KERNEL"), config_get_string_value(config_global, "PUERTO_KERNEL->MEMORIA"));
+        cliente_conexion_KERNEL(    
+            config_get_string_value(config_global, "PUERTO_KERNEL->MEMORIA"),
+            config_get_string_value(config_global, "IP_KERNEL"));
+
         strcpy(ret, "Se finalizo el thread conexion KERNEL_MEMORIA");
         #endif
         pthread_exit(ret);
@@ -313,7 +319,10 @@ void *thread_crear_conexion_client(void *arg) {
 
     case CPU_MEMORIA:
         #ifdef MEMORIA_MAIN_H_
-        conexion_cpu(config_get_string_value(config_global, "IP_CPU"), config_get_string_value(config_global, "PUERTO_CPU->MEMORIA"));
+        cliente_conexion_CPU(
+            config_get_string_value(config_global, "PUERTO_CPU->MEMORIA"),
+            config_get_string_value(config_global, "IP_CPU"));
+
         strcpy(ret, "Se finalizo el thread conexion CPU_MEMORIA");
         #endif
         pthread_exit(ret);
@@ -321,7 +330,10 @@ void *thread_crear_conexion_client(void *arg) {
 
     case IO_KERNEL:
         #ifdef KERNEL_MAIN_H_
-        conexion_io(config_get_string_value(config_global, "IP_IO"), config_get_string_value(config_global, "PUERTO_IO->KERNEL"));
+        cliente_conexion_IO(
+            config_get_string_value(config_global, "PUERTO_IO->KERNEL"),
+            config_get_string_value(config_global, "IP_IO"));
+
         strcpy(ret, "Se finalizo el thread conexion IO_KERNEL");
         #endif
         pthread_exit(ret);
@@ -329,7 +341,10 @@ void *thread_crear_conexion_client(void *arg) {
 
     case IO_MEMORIA:
         #ifdef MEMORIA_MAIN_H_
-        conexion_io(config_get_string_value(config_global, "IP_IO"), config_get_string_value(config_global, "PUERTO_IO->MEMORIA"));
+        cliente_conexion_IO(
+            config_get_string_value(config_global, "PUERTO_IO->MEMORIA"),
+            config_get_string_value(config_global, "IP_IO"));
+
         strcpy(ret, "Se finalizo el thread conexion IO_MEMORIA");
         #endif
         pthread_exit(ret);

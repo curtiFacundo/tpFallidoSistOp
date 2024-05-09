@@ -3,8 +3,8 @@
 #include "entradasalida_main.h"
 
 t_config* config_global;
-t_list *handshake;
-t_paquete* send_handshake_Kernel;
+
+
 int main(int argc, char* argv[]) {
         
 	/*
@@ -38,7 +38,7 @@ int main(int argc, char* argv[]) {
 		list_iterate(handshake, (void*) iterator); //no se como funciona esto 💁🏼
 		break;
 	case -1:
-			log_error(logger, "el cliente Kernel se desconecto. Terminando servidor I/O");
+			log_error(logger, handshake"el cliente Kernel se desconecto. Terminando servidor I/O");
 			return EXIT_FAILURE;
 	default:
 		log_warning(logger,"Operacion desconocida. No quieras meter la pata");
@@ -84,3 +84,61 @@ int main(int argc, char* argv[]) {
     return 0;
 }
 
+void conexion_kernel(char* puerto) 
+{
+	t_list *handshake;
+
+	int server = iniciar_servidor(puerto);
+		log_info(logger, "Servidor listo para recibir al cliente CPU");
+		int cliente = esperar_cliente(server);
+		while(true){
+			int cod_op = recibir_operacion(cliente);
+			switch (cod_op)
+			{
+				case HANDSHAKE:
+					handshake = recibir_paquete(cliente);
+					log_info(logger, "me llego:\n");
+					list_iterate(handshake, (void*) iterator); //no se como funciona esto 💁🏼
+					break;
+				case -1:
+					log_error(logger, "el cliente se desconecto. Terminando servidor");
+					return EXIT_FAILURE;
+					break;
+				default:
+					log_warning(logger,"Operacion desconocida. No quieras meter la pata");
+					break;
+			}
+		}
+		
+	close(server);
+	close(cliente);
+}
+void conexion_memoria(char* puerto) 
+{
+	t_list *handshake;
+
+	int server = iniciar_servidor(puerto);
+		log_info(logger, "Servidor listo para recibir al cliente CPU");
+		int cliente = esperar_cliente(server);
+		while(true){
+			int cod_op = recibir_operacion(cliente);
+			switch (cod_op)
+			{
+				case HANDSHAKE:
+					handshake = recibir_paquete(cliente);
+					log_info(logger, "me llego:\n");
+					list_iterate(handshake, (void*) iterator); //no se como funciona esto 💁🏼
+					break;
+				case -1:
+					log_error(logger, "el cliente se desconecto. Terminando servidor");
+					return EXIT_FAILURE;
+					break;
+				default:
+					log_warning(logger,"Operacion desconocida. No quieras meter la pata");
+					break;
+			}
+		}
+		
+	close(server);
+	close(cliente);
+}

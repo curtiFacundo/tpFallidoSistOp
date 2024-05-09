@@ -65,3 +65,99 @@ int main(void) {
 	liberar_conexion(conexion_IO_memoria);
 	//-- FINALIZA CLIENTE PARA IO
 }
+void cliente_conexion_IO(char * puerto, char * ip){
+	t_paquete* send_handshake;
+	int conexion_IO;
+	protocolo_socket op;
+	int flag=1;
+
+	conexion_IO = crear_conexion(ip, puerto);
+	send_handshake = crear_paquete(HANDSHAKE);
+	agregar_a_paquete (send_handshake, "hola soy memoria", 16+1);
+
+	while(flag){
+		enviar_paquete(send_handshake, conexion_IO);
+		sleep(1);
+		op = recibir_operacion(conexion_IO);
+		switch (op)
+		{
+		case HANDSHAKE:
+			log_info("recibi handshake de IO");
+			break;
+		
+		case TERMINATE:
+			flag = 0;
+			break;
+
+		default:
+			break;
+		}
+	}
+
+	eliminar_paquete(send_handshake);
+	liberar_conexion(conexion_IO);
+}
+void cliente_conexion_CPU(char * puerto, char * ip){
+	t_paquete* send_handshake;
+	int conexion_IO;
+	protocolo_socket op;
+	int flag=1;
+
+	conexion_IO = crear_conexion(ip, puerto);
+	send_handshake = crear_paquete(HANDSHAKE);
+	agregar_a_paquete (send_handshake, "hola soy memoria", 16+1);
+
+	while(flag){
+		enviar_paquete(send_handshake, conexion_IO);
+		sleep(1);
+		op = recibir_operacion(conexion_IO);
+		switch (op)
+		{
+		case HANDSHAKE:
+			log_info("recibi handshake de CPU");
+			break;
+		
+		case TERMINATE:
+			flag = 0;
+			break;
+
+		default:
+			break;
+		}
+	}
+
+	eliminar_paquete(send_handshake);
+	liberar_conexion(conexion_IO);
+}
+void cliente_conexion_KERNEL(char * puerto, char * ip){
+	t_paquete* send_handshake;
+	int conexion_IO;
+	protocolo_socket op;
+	int flag=1;
+
+	conexion_IO = crear_conexion(ip, puerto);
+	send_handshake = crear_paquete(HANDSHAKE);
+	agregar_a_paquete (send_handshake, "hola soy memoria", 16+1);
+
+	while(flag){
+		enviar_paquete(send_handshake, conexion_IO);
+		sleep(1);
+		op = recibir_operacion(conexion_IO);
+		switch (op)
+		{
+		case HANDSHAKE:
+			log_info("recibi handshake de KERNEL");
+			break;
+		
+		case TERMINATE:
+			flag = 0;
+			break;
+
+		default:
+			break;
+		}
+	}
+
+	eliminar_paquete(send_handshake);
+	liberar_conexion(conexion_IO);
+}
