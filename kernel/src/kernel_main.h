@@ -8,7 +8,7 @@
 #include<commons/config.h>
 #include<readline/readline.h>
 
-#include "../../utils/src/utils/utils.h"
+#include "../../utils/src/utils.h"
 
 
 t_log* iniciar_logger(void);
@@ -18,7 +18,5 @@ void EscucharServidor(char*,char*);
 void conexion_cpu(char*);
 void conexion_memoria(char*);
 void cliente_conexion_IO(char *, char *);
-
-
 
 #endif /* KERNEL_MAIN_H_ */

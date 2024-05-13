@@ -6,7 +6,7 @@
 #include <string.h>
 #include <commons/log.h>
 
-#include "../../utils/src/utils/utils.h"
+#include "../../utils/src/utils.h"
 
 int Saludar(void);
 void cliente_conexion_IO(char *, char * );

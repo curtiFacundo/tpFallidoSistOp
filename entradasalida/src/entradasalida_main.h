@@ -8,7 +8,7 @@
 #include<commons/config.h>
 #include<readline/readline.h>
 
-#include "../../utils/src/utils/utils.h"
+#include "../../utils/src/utils.h"
 
 void conexion_kernel(char*);
 void conexion_memoria(char*);

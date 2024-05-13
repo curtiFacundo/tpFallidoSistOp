@@ -15,6 +15,7 @@
 #include <unistd.h>
 #include <sys/socket.h>
 #include <pthread.h>
+#include <semaphore.h>
 
 /* Orden de conexiones:
 Server -> Cliente:
