@@ -19,6 +19,7 @@ int main(int argc, char* argv[])
 	char* puerto, *puerto_IO_KERNEL;
 	char* valor_MEMORIA, *valor_IO;
 	char* mensaje;
+	t_paquete* send_handshake_io;
 
 
     logger = log_create("kernel.log", "Kernel", 1, LOG_LEVEL_DEBUG);
@@ -43,7 +44,7 @@ int main(int argc, char* argv[])
     puerto_IO_KERNEL = config_get_string_value(config_global, "PUERTO_IO->KERNEL");
 	valor_IO = config_get_string_value(config_global, "CLAVE_KERNEL"); //Decia CLAVE.
 
-	conexion_IO_KERNEL = crear_conexion(ip_IO, puerto_IO_KERNEL, logger);
+	conexion_IO_KERNEL = crear_conexion(ip_IO, puerto_IO_KERNEL);
 	send_handshake_io = crear_paquete(HANDSHAKE);
 
 	agregar_a_paquete (send_handshake_io, valor_IO, strlen(valor_IO)+1);
@@ -86,7 +87,7 @@ void conexion_cpu(char* puerto)
 		int cliente = esperar_cliente(server);
 		while(true){
 			int cod_op = recibir_operacion(cliente);
-			switch (cod_op)d
+			switch (cod_op)
 			{
 				case HANDSHAKE:
 					handshake = recibir_paquete(cliente);
@@ -103,7 +104,7 @@ void conexion_cpu(char* puerto)
 			}
 		}
 		
-	close(server);d
+	close(server);
 	close(cliente);
 }
 void conexion_memoria(char* puerto) 
@@ -139,10 +140,12 @@ void cliente_conexion_IO(char * puerto, char * ip){
 	int conexion_IO_KERNEL;
 	protocolo_socket op;
 	int flag=1;
+	char *valor_IO;
+	valor_IO = config_get_string_value(config_global, "CLAVE_KERNEL");
 
 	conexion_IO_KERNEL = crear_conexion(ip, puerto);
 	send_handshake_io = crear_paquete(HANDSHAKE);
-	agregar_a_paquete (send_handshake_io, valor_IO, strlen(valor_IO)+1);
+	agregar_a_paquete (send_handshake_io,valor_IO, strlen(valor_IO)+1); 
 
 	while(flag){
 		enviar_paquete(send_handshake_io, conexion_IO_KERNEL);
@@ -151,7 +154,7 @@ void cliente_conexion_IO(char * puerto, char * ip){
 		switch (op)
 		{
 		case HANDSHAKE:
-			log_info("recibi handshake de IO");
+			log_info(logger, "recibi handshake de IO");
 			break;
 		
 		case TERMINATE:

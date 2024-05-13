@@ -143,7 +143,7 @@ void decir_hola(char* quien) {
     {
         t_paquete* paquete = malloc(sizeof(t_paquete));
 
-        paquete->codigo_operacion = MENSAJE;config_get_string_value(config_global, "IP_CPU")
+        paquete->codigo_operacion = MENSAJE;config_get_string_value(config_global, "IP_CPU");
         paquete->buffer = malloc(sizeof(t_buffer));
         paquete->buffer->size = strlen(mensaje) + 1;
         paquete->buffer->stream = malloc(paquete->buffer->size);

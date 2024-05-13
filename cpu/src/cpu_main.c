@@ -51,7 +51,7 @@ int main(void) {
 	//Config para conexion con Kernel. KERNEL->CPU
 	ip_Kernel = config_get_string_value(config_global, "IP_KERNEL");
     puerto_KERNEL_CPU = config_get_string_value(config_global, "PUERTO_KERNEL->CPU");
-	valor_KERNEL = config_get_string_value(config_global, "CLAVE_CPU");
+	
 
 	conexion_KERNEL_CPU = crear_conexion(ip_Kernel, puerto_KERNEL_CPU, logger);
 	send_handshake_Kernel = crear_paquete(HANDSHAKE);
@@ -72,10 +72,12 @@ void cliente_conexion_KERNEL(char * puerto, char * ip){
 	int conexion;
 	protocolo_socket op;
 	int flag=1;
+	char* valor_KERNEL;
+	
 
 	conexion = crear_conexion(ip, puerto);
 	send_handshake = crear_paquete(HANDSHAKE);
-	agregar_a_paquete (send_handshake, "hola soy CPU", 12+1);
+	agregar_a_paquete (send_handshake, valor_KERNEL , strlen(valor_KERNEL)+1); // no seria CLAVE_CPU?
 
 	while(flag){
 		enviar_paquete(send_handshake, conexion);

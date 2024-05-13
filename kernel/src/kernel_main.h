@@ -19,4 +19,6 @@ void conexion_cpu(char*);
 void conexion_memoria(char*);
 void cliente_conexion_IO(char *, char *);
 
+
+
 #endif /* KERNEL_MAIN_H_ */
