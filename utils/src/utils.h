@@ -87,8 +87,8 @@ typedef enum
     IO_MEMORIA,
 
 }tipo_conexion;
-void *thread_crear_conexion_server(void *arg);
-void *thread_crear_conexion_cliente(void *arg);
+void *thread_crear_conexion_server(void *);
+void *thread_crear_conexion_cliente(void *);
 //THREADS
 
 #endif

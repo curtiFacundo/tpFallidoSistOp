@@ -31,12 +31,12 @@ int main(int argc, char* argv[])
 	//conexiones
 
 	//espero fin conexiones
-	pthread_join(tid_memoria, ret_value);
-	log_info(ret_value);
-	pthread_join(tid_cpu, ret_value);
-	log_info(ret_value);
-	pthread_join(tid_io, ret_value);
-	log_info(ret_value);
+	pthread_join(tid_memoria, &ret_value);
+	log_info(logger,ret_value);
+	pthread_join(tid_cpu, &ret_value);
+	log_info(logger,ret_value);
+	pthread_join(tid_io, &ret_value);
+	log_info(logger, ret_value);
 	//espero fin conexiones
 	
 	return 0;
@@ -48,7 +48,6 @@ void conexion_cpu(char* puerto)
 	
 	int server = iniciar_servidor(puerto);
 		log_info(logger, "Servidor listo para recibir al cliente CPU");
-		sem_post(server_kernel_cpu);
 		int cliente = esperar_cliente(server);
 		while(true){
 			int cod_op = recibir_operacion(cliente);
@@ -77,7 +76,7 @@ void conexion_memoria(char* puerto)
 	t_list *handshake;
 	int server = iniciar_servidor(puerto);
 		log_info(logger, "Servidor listo para recibir al cliente MEMORIA");
-		sem_post(server_kernel_memoria);
+
 		int cliente = esperar_cliente(server);
 		while(true){
 			int cod_op = recibir_operacion(cliente);
@@ -110,7 +109,6 @@ void cliente_conexion_IO(char * puerto, char * ip){
 	char *valor_IO;
 	valor_IO = config_get_string_value(config_global, "CLAVE_KERNEL");
 
-	sem_wait(server_io);
 	conexion_IO_KERNEL = crear_conexion(ip, puerto);
 	send_handshake_io = crear_paquete(HANDSHAKE);
 	agregar_a_paquete (send_handshake_io,valor_IO, strlen(valor_IO)+1); 

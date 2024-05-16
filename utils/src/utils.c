@@ -244,22 +244,18 @@ void iterator(char* value) {
 //THREADS
 void *thread_crear_conexion_server(void *arg) {
   //return value
-  char *ret;
+  char ret[1000];
   strcpy(ret, "Error de thread -> argumento invalido");
   switch((tipo_conexion) arg){
     case KERNEL_CPU:
-        #ifdef KERNEL_MAIN_H_
         conexion_cpu(config_get_string_value(config_global, "PUERTO_KERNEL->CPU"));
         strcpy(ret, "Se finalizo el thread conexion Kernel_CPU");
-        #endif
         pthread_exit(ret);
         break;
     
     case KERNEL_MEMORIA:
-        #ifdef KERNEL_MAIN_H_
         conexion_memoria(config_get_string_value(config_global, "PUERTO_KERNEL->MEMORIA"));
         strcpy(ret, "Se finalizo el thread conexion Kernel_MEMORIA");
-        #endif
         pthread_exit(ret);
         break;
 
@@ -291,9 +287,9 @@ void *thread_crear_conexion_server(void *arg) {
   strcpy(ret, "Mensaje finalizacion placeholder");
   pthread_exit(ret);
 }
-void *thread_crear_conexion_client(void *arg) {
+void *thread_crear_conexion_cliente(void *arg) {
   //return value
-  char *ret;
+  char ret[100];
   strcpy(ret, "Error de thread -> argumento invalido");
   switch((tipo_conexion) arg){
     case KERNEL_CPU:
@@ -330,13 +326,13 @@ void *thread_crear_conexion_client(void *arg) {
         break;
 
     case IO_KERNEL:
-        #ifdef KERNEL_MAIN_H_
+        
         cliente_conexion_IO(
-            config_get_string_value(config_global, "PUERTO_IO->KERNEL"),
-            config_get_string_value(config_global, "IP_IO"));
+        config_get_string_value(config_global, "PUERTO_IO->KERNEL"),
+        config_get_string_value(config_global, "IP_IO"));
 
         strcpy(ret, "Se finalizo el thread conexion IO_KERNEL");
-        #endif
+
         pthread_exit(ret);
         break;
 
