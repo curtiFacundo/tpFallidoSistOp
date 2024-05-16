@@ -2,10 +2,6 @@
 #include <stdio.h>
 #include "memoria_main.h"
 
-sem_t *server_io_memoria = sem_open(SEM_SERVER_IO_MEMORIA, 0);
-sem_t *server_kernel_memoria = sem_open(SEM_SERVER_KERNEL_MEMORIA, 0);
-sem_t *server_cpu_memoria = sem_open(SEM_SERVER_CPU_MEMORIA, 0);
-
 int Saludar(void) {
     logger = log_create("memoria.log", "memoria", 1, LOG_LEVEL_DEBUG);
 	log_info(logger,"Hola! CPU");

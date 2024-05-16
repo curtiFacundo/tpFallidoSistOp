@@ -3,8 +3,6 @@
 #include "entradasalida_main.h"
 
 t_config* config_global;
-sem_t *server_io_kernel = sem_open(SEM_SERVER_IO_KERNEL, 00000100, 0644, 0);
-sem_t *server_io_memoria = sem_open(SEM_SERVER_IO_MEMORIA, 00000100, 0644, 0);
 
 int main(int argc, char* argv[]) {
         

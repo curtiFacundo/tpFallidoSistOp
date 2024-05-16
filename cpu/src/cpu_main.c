@@ -2,8 +2,6 @@
 #include <stdio.h>
 #include "cpu_main.h"
 
-sem_t *server_cpu_memoria = sem_open(SEM_SERVER_CPU_MEMORIA, 00000100, 0644, 0);
-sem_t *server_kernel_cpu = sem_open(SEM_SERVER_KERNEL_CPU, 0);
 
 int main(void) {
     

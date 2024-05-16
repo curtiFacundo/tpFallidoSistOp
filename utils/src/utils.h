@@ -1,7 +1,6 @@
 #ifndef UTILS_H_
 #define UTILS_H_
 
-#include <linux/types.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <commons/log.h>
@@ -26,12 +25,6 @@ Server -> Cliente:
 * I/O -> Kernel
 * I/O -> Memoria
 */
-
-#define SEM_SERVER_KERNEL_MEMORIA "SEM_SERVER_KERNEL_MEMORIA"
-#define SEM_SERVER_KERNEL_CPU "SEM_SERVER_KERNEL_CPU"
-#define SEM_SERVER_CPU_MEMORIA "SEM_SERVER_CPU_MEMORIA"
-#define SEM_SERVER_IO_MEMORIA "SEM_SERVER_IO_MEMORIA"
-#define SEM_SERVER_IO_KERNEL "SEM_SERVER_IO_KERNEL"
 
 typedef enum
 {

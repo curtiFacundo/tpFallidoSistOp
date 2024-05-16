@@ -1,11 +1,10 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <semaphore.h>
 #include "kernel_main.h"
 
 t_config* config_global;
-sem_t *server_kernel_memoria = sem_open(SEM_SERVER_KERNEL_MEMORIA, 00000100, 0644, 0);
-sem_t *server_kernel_cpu = sem_open(SEM_SERVER_KERNEL_CPU, 00000100, 0644, 0);
-sem_t *server_io_kernel = sem_open(SEM_SERVER_IO_KERNEL, 0);
+
 
 int main(int argc, char* argv[]) 
 {    
@@ -62,7 +61,7 @@ void conexion_cpu(char* puerto)
 					break;
 				case -1:
 					log_error(logger, "el cliente se desconecto. Terminando servidor");
-					return;
+					return EXIT_FAILURE;
 					break;
 				default:
 					log_warning(logger,"Operacion desconocida. No quieras meter la pata");
@@ -90,8 +89,8 @@ void conexion_memoria(char* puerto)
 					list_iterate(handshake, (void*) iterator); //no se como funciona esto 💁🏼
 					break;
 				case -1:
-						log_error(logger, "el cliente se desconecto. Terminando servidor");
-						return;
+						//log_error(logger, "el cliente se desconecto. Terminando servidor");
+						//return EXIT_FAILURE;
 						break;
 				default:
 					log_warning(logger,"Operacion desconocida. No quieras meter la pata");
@@ -111,7 +110,7 @@ void cliente_conexion_IO(char * puerto, char * ip){
 	char *valor_IO;
 	valor_IO = config_get_string_value(config_global, "CLAVE_KERNEL");
 
-	sem_wait(server_io_kernel);
+	sem_wait(server_io);
 	conexion_IO_KERNEL = crear_conexion(ip, puerto);
 	send_handshake_io = crear_paquete(HANDSHAKE);
 	agregar_a_paquete (send_handshake_io,valor_IO, strlen(valor_IO)+1); 
