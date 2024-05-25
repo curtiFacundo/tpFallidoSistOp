@@ -9,6 +9,11 @@ typedef enum
 }t_estado;
 
 typedef struct{
+    uint32_t PC;//PROGRAM COUNTER
+    uint8_t AX;
+    uint8_t BX;
+    uint8_t CX;
+    uint8_t DX;
     uint32_t eax;
     uint32_t ebx;
     uint32_t ecx;

@@ -99,13 +99,54 @@ void conexion_memoria(char* puerto)
 }
 
 void Fetch(){
-	esperarProximaInstruccion();
+	//esperarProximaInstruccion();
 
 }
 
 void Decode(){
 	//ToDo interpretar qué instrucción es la que se va a ejecutar y si requiere de una traducción de dirección lógica a dirección física.
-
+	execute();
 	// [número_pagina | desplazamiento] paginacion
-
 }
+void execute()
+{
+    char op;
+	op = "set";
+	switch(op){
+		case "set":
+			SET();
+			break;
+		case "sum":
+			SUN();
+			break;
+		case "sub":
+			SUB();
+			break;
+		case "jnz":
+			JNZ();
+			break;
+		/*case "io_gen_sleep":
+			IO_GEN_SLEEP();
+			break;
+		*/
+	}
+}
+void SET(RegistroCPU Registro,int Valor){
+	Registro = Valor;
+}
+void SUM(RegistroCPU Destino, RegistroCPU Origen){
+	Destino = Destino + Origen;
+}
+void SUB(RegistroCPU Destino, RegistroCPU Origen){
+	Destino = Destino - Origen;
+}
+void JNZ(RegistroCPU Registro, int Instrucción){
+	if (RegistroCPU!=0){//VALOR DEL REGISTRO DISTINTO A 0
+		Registro<-PC = Instrucción;
+	}
+}
+/*
+void IO_GEN_SLEEP(char Interfaz, int Unidadestrabajo){
+}
+*/
+
