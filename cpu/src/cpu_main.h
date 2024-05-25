@@ -11,5 +11,13 @@
 void cliente_conexion_KERNEL(char *, char *);
 void conexion_memoria(char*);
 void levantar_conexiones();
+void Fetch();
+void Decode();
+void SET (Registro, Valor); //Asigna al registro el valor pasado como parámetro.
+void SUM (Registro Destino, Registro Origen); //Suma al Registro Destino el Registro Origen y deja el resultado en el Registro Destino.
+void SUB (Registro Destino, Registro Origen); //Resta al Registro Destino el Registro Origen y deja el resultado en el Registro Destino.
+void JNZ (Registro, Instrucción); //Si el valor del registro es distinto de cero, actualiza el program counter al número de instrucción pasada por parámetro.
+void IO_GEN_SLEEP (Interfaz, Unidades de trabajo); //Esta instrucción solicita al Kernel que se envíe a una interfaz de I/O a que realice un sleep por una cantidad de unidades de trabajo.
+void CheckInterrupt();
 
 #endif /* CPU_MAIN_H_ */

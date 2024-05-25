@@ -98,3 +98,14 @@ void conexion_memoria(char* puerto)
 	close(cliente);
 }
 
+void Fetch(){
+	esperarProximaInstruccion();
+
+}
+
+void Decode(){
+	//ToDo interpretar qué instrucción es la que se va a ejecutar y si requiere de una traducción de dirección lógica a dirección física.
+
+	// [número_pagina | desplazamiento] paginacion
+
+}
