@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "cpu_main.h"
 
+
 int main(void) {
     
 	/*
@@ -11,60 +12,141 @@ int main(void) {
 
 	logger = log_create("cpu.log", "cpu", 1, LOG_LEVEL_DEBUG); //movido al mail desde abrirServerCPU
 	
-	char* ip,*ipKernel;
-	char* puerto,*puertoKernel;
-	char* valor,*valorKernel;
-	char* mensaje;
-	int conexionKernel;
-	t_config* config;
-	t_list *handshake;
-	t_paquete* send_handshake_Kernel;
+	pthread_t tid_memoria;
+	pthread_t tid_kernel;
+	char *ret_value;
 	
 
     //int socket_id = iniciar_servidor();
-    config = config_create("../utils/config/cpu.config");
+    config_global = config_create("../utils/config/config_global.config");
 
-    ip = config_get_string_value(config, "IP");
-    puerto = config_get_string_value(config, "PUERTOMEMORIA");
-	valor = config_get_string_value(config, "CLAVE");
+	//conexiones
+	pthread_create(&tid_memoria, NULL, thread_crear_conexion_server, CPU_MEMORIA);
+	pthread_create(&tid_kernel, NULL, thread_crear_conexion_cliente, KERNEL_CPU);
+	//conexiones
 
-	int server_fd_memoria = iniciar_servidor(puerto);
-	log_info(logger, "Servidor listo para recibir al cliente");
-	int cliente_fd_memoria = esperar_cliente(server_fd_memoria);
-	int cod_op = recibir_operacion(cliente_fd_memoria);
-	switch (cod_op)
-	{
-	case HANDSHAKE:
-		handshake = recibir_paquete(cliente_fd_memoria);
-		log_info(logger, "me llego:\n");
-		list_iterate(handshake, (void*) iterator); //no se como funciona esto 💁🏼
-		break;
-	case -1:
-			log_error(logger, "el cliente se desconecto. Terminando servidor");
-			return EXIT_FAILURE;
-	default:
-		log_warning(logger,"Operacion desconocida. No quieras meter la pata");
-		break;
-	}
-	
-	//Config para conexion con Kernel
-	ipKernel = config_get_string_value(config, "IPKERNEL");
-    puertoKernel = config_get_string_value(config, "PUERTOKERNEL");
-	valorKernel = config_get_string_value(config, "CLAVE");
+	//espero fin conexiones
+	pthread_join(tid_memoria, ret_value);
+	log_info(ret_value);
+	pthread_join(tid_kernel, ret_value);
+	log_info(ret_value);
+	//espero fin conexiones
 
-	conexionKernel = crear_conexion(ipKernel, puertoKernel, logger);
-	send_handshake_Kernel = crear_paquete(HANDSHAKE);
-
-	agregar_a_paquete(send_handshake_Kernel, valorKernel, strlen(valor)+1);
-	enviar_paquete(send_handshake_Kernel, conexionKernel);
-	eliminar_paquete(send_handshake_Kernel);
-	liberar_conexion(conexionKernel);
-	
-	// t_paquete *crear_paquete(HANDSHAKE);
-	// agregar_a_paquete(valor)
-
-	terminar_programa(server_fd_memoria, logger, config); //logger: redundante (global) pero esta definido asi en utils.h
+	terminar_programa(server_fd_memoria, logger, config_global); //logger: redundante (global) pero esta definido asi en utils.h
     return 0;
 }
+void cliente_conexion_KERNEL(char * puerto, char * ip){
+	t_paquete* send_handshake;
+	int conexion;
+	protocolo_socket op;
+	int flag=1;
+	char* valor_KERNEL;
+	
+	sem_wait(server_kernel_cpu);
+	conexion = crear_conexion(ip, puerto);
+	send_handshake = crear_paquete(HANDSHAKE);
+	agregar_a_paquete (send_handshake, valor_KERNEL , strlen(valor_KERNEL)+1); // no seria CLAVE_CPU?
 
+	while(flag){
+		enviar_paquete(send_handshake, conexion);
+		sleep(1);
+		op = recibir_operacion(conexion);
+		switch (op)
+		{
+		case HANDSHAKE:
+			log_info("recibi handshake de KERNEL");
+			break;
+		
+		case TERMINATE:
+			flag = 0;
+			break;
+
+		default:
+			break;
+		}
+	}
+
+	eliminar_paquete(send_handshake);
+	liberar_conexion(conexion);
+}
+void conexion_memoria(char* puerto) 
+{
+	int server = iniciar_servidor(puerto);
+		log_info(logger, "Servidor listo para recibir al cliente Memoria");
+		sem_post(server_cpu_memoria);
+		int cliente = esperar_cliente(server);
+		while(true){
+			int cod_op = recibir_operacion(cliente);
+			switch (cod_op)
+			{
+				case HANDSHAKE:
+					handshake = recibir_paquete(cliente);
+					log_info(logger, "me llego:\n");
+					list_iterate(handshake, (void*) iterator); //no se como funciona esto 💁🏼
+					break;
+				case -1:
+					log_error(logger, "el cliente se desconecto. Terminando servidor");
+					return EXIT_FAILURE;
+					break;
+				default:
+					log_warning(logger,"Operacion desconocida. No quieras meter la pata");
+					break;
+			}
+		}
+		
+	close(server);
+	close(cliente);
+}
+
+void Fetch(){
+	//esperarProximaInstruccion();
+
+}
+
+void Decode(){
+	//ToDo interpretar qué instrucción es la que se va a ejecutar y si requiere de una traducción de dirección lógica a dirección física.
+	execute();
+	// [número_pagina | desplazamiento] paginacion
+}
+void execute()
+{
+    char op;
+	op = "set";
+	switch(op){
+		case "set":
+			SET();
+			break;
+		case "sum":
+			SUN();
+			break;
+		case "sub":
+			SUB();
+			break;
+		case "jnz":
+			JNZ();
+			break;
+		/*case "io_gen_sleep":
+			IO_GEN_SLEEP();
+			break;
+		*/
+	}
+}
+void SET(RegistroCPU Registro,int Valor){
+	Registro = Valor;
+}
+void SUM(RegistroCPU Destino, RegistroCPU Origen){
+	Destino = Destino + Origen;
+}
+void SUB(RegistroCPU Destino, RegistroCPU Origen){
+	Destino = Destino - Origen;
+}
+void JNZ(RegistroCPU Registro, int Instrucción){
+	if (RegistroCPU!=0){//VALOR DEL REGISTRO DISTINTO A 0
+		Registro<-PC = Instrucción;
+	}
+}
+/*
+void IO_GEN_SLEEP(char Interfaz, int Unidadestrabajo){
+}
+*/
 

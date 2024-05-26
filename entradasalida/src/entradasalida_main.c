@@ -2,85 +2,92 @@
 #include <stdio.h>
 #include "entradasalida_main.h"
 
-t_config* config;
-t_list *handshake;
-t_paquete* send_handshake_Kernel;
+t_config* config_global;
+
 int main(int argc, char* argv[]) {
         
 	/*
 	TO DO list:
 	*/
-    
-	char* ip;
-	char* puerto;
-	char* valor;
-	char* mensaje;
-
+	pthread_t tid_kernel;
+	pthread_t tid_memoria;
+	char *ret_value;
+ 
     logger = log_create("entradasalida.log", "entradasalida", 1, LOG_LEVEL_DEBUG);
-    //int socket_id = iniciar_servidor();
-    config = config_create("../utils/config/entradasalida.config");
-    // SERVER KERNEL
-    ip = config_get_string_value(config, "IP");
-    puerto = config_get_string_value(config, "PUERTOKERNEL");
-	valor = config_get_string_value(config, "CLAVE");
+    config_global = config_create("../utils/config/config_global.config");
     
-    int server_fd_kernel = iniciar_servidor(puerto);
-	log_info(logger, "Servidor I/O listo para recibir al cliente Kernel");
-	int cliente_fd_kernel = esperar_cliente(server_fd_kernel);
-	int cod_op = recibir_operacion(cliente_fd_kernel);
+	//conexiones
+	pthread_create(&tid_kernel, NULL, thread_crear_conexion_server, IO_KERNEL);
+	pthread_create(&tid_memoria, NULL, thread_crear_conexion_server, IO_MEMORIA);
+	//conexiones
 
-	switch (cod_op)
-	{
-	case HANDSHAKE:
-		handshake = recibir_paquete(cliente_fd_kernel);
-		log_info(logger, "me llego:\n");
-		list_iterate(handshake, (void*) iterator); //no se como funciona esto 💁🏼
-		break;
-	case -1:
-			log_error(logger, "el cliente Kernel se desconecto. Terminando servidor I/O");
-			return EXIT_FAILURE;
-	default:
-		log_warning(logger,"Operacion desconocida. No quieras meter la pata");
-		break;
-	}
-	// FIN SERVER KERNEL
+	//espero fin conexiones
+	pthread_join(tid_kernel, ret_value);
+	log_info(ret_value);
+	pthread_join(tid_memoria, ret_value);
+	log_info(ret_value);
+	//espero fin conexiones
 
-    // SERVER MEMORIA
-    ip = config_get_string_value(config, "IPMEMORIA");
-    puerto = config_get_string_value(config, "PUERTOMEMORIA");
-	valor = config_get_string_value(config, "CLAVE");
-    
-    int server_fd_memoria = iniciar_servidor(puerto);
-	log_info(logger, "Servidor I/O listo para recibir al cliente Memoria");
-	int cliente_fd_memoria = esperar_cliente(server_fd_memoria);
-	cod_op = recibir_operacion(cliente_fd_memoria);
-
-	switch (cod_op)
-	{
-	case HANDSHAKE:
-		handshake = recibir_paquete(cliente_fd_memoria);
-		log_info(logger, "me llego:\n");
-		list_iterate(handshake, (void*) iterator); //no se como funciona esto 💁🏼
-		break;
-	case -1:
-			log_error(logger, "el cliente Memoria se desconecto. Terminando servidor I/O");
-			return EXIT_FAILURE;
-	default:
-		log_warning(logger,"Operacion desconocida. No quieras meter la pata");
-		break;
-	}
-	// FIN SERVER MEMORIA
-
-
-	
-	// t_paquete *crear_paquete(HANDSHAKE);
-	// agregar_a_paquete(valor)
-
-	terminar_programa(server_fd_kernel, logger, config); //logger: redundante (global) pero esta definido asi en utils.h
-	close(cliente_fd_kernel);
-
-	close(server_fd_memoria);
-	close(cliente_fd_memoria);
     return 0;
 }
 
+void conexion_kernel(char* puerto) 
+{
+	t_list *handshake;
+
+	int server = iniciar_servidor(puerto);
+		log_info(logger, "Servidor listo para recibir al cliente CPU");
+		sem_post(server_io_kernel);
+		int cliente = esperar_cliente(server);
+		while(true){
+			int cod_op = recibir_operacion(cliente);
+			switch (cod_op)
+			{
+				case HANDSHAKE:
+					handshake = recibir_paquete(cliente);
+					log_info(logger, "me llego:\n");
+					list_iterate(handshake, (void*) iterator); //no se como funciona esto 💁🏼
+					break;
+				case -1:
+					log_error(logger, "el cliente se desconecto. Terminando servidor");
+					return EXIT_FAILURE;
+					break;
+				default:
+					log_warning(logger,"Operacion desconocida. No quieras meter la pata");
+					break;
+			}
+		}
+		
+	close(server);
+	close(cliente);
+}
+void conexion_memoria(char* puerto) 
+{
+	t_list *handshake;
+
+	int server = iniciar_servidor(puerto);
+		log_info(logger, "Servidor listo para recibir al cliente CPU");
+		sem_post(server_io_memoria); //condicion de carrera entre esperar_cliente de io y crear_conexion de memoria?
+		int cliente = esperar_cliente(server);
+		while(true){
+			int cod_op = recibir_operacion(cliente);
+			switch (cod_op)
+			{
+				case HANDSHAKE:
+					handshake = recibir_paquete(cliente);
+					log_info(logger, "me llego:\n");
+					list_iterate(handshake, (void*) iterator); //no se como funciona esto 💁🏼
+					break;
+				case -1:
+					log_error(logger, "el cliente se desconecto. Terminando servidor");
+					return EXIT_FAILURE;
+					break;
+				default:
+					log_warning(logger,"Operacion desconocida. No quieras meter la pata");
+					break;
+			}
+		}
+		
+	close(server);
+	close(cliente);
+}
