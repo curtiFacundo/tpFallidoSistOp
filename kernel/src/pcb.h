@@ -1,4 +1,5 @@
 #include  <stdint.h> // asegura que usamos tipos de enteros estándar 
+
 typedef enum  
 {
     NEW,
@@ -10,11 +11,11 @@ typedef enum
 
 typedef struct{
     uint32_t PC;//PROGRAM COUNTER
-    uint8_t AX;
-    uint8_t BX;
-    uint8_t CX;
-    uint8_t DX;
-    uint32_t eax;
+    uint8_t AX ;
+    uint8_t BX ;
+    uint8_t CX ;
+    uint8_t DX ;
+    uint32_t eax ;
     uint32_t ebx;
     uint32_t ecx;
     uint32_t edx;
@@ -34,3 +35,6 @@ typedef struct{
 
 
 pcb* crear_pcb(int pid, int pc_id, int quantum, RegistroCPU registros, t_list* instrucciones);
+pcb* armar_pcb(int pid, int pc_id, int quantum, int estado, RegistroCPU registros, t_list* instrucciones);
+void eliminar_PCB(pcb* pcb_p);
+void cambiar_estado(pcb* pcb_p, int estado);
