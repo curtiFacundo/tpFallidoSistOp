@@ -42,10 +42,11 @@ void cliente_conexion_KERNEL(char * puerto, char * ip){
 	int flag=1;
 	char* valor_KERNEL;
 	
-	sem_wait(server_kernel_cpu);
-	conexion = crear_conexion(ip, puerto);
+	valor_IO = config_get_string_value(config_global, "CLAVE_CPU");
+	// sem_wait(server_kernel_cpu); 
+	send_han = crear_conexion(ip, puerto);
 	send_handshake = crear_paquete(HANDSHAKE);
-	agregar_a_paquete (send_handshake, valor_KERNEL , strlen(valor_KERNEL)+1); // no seria CLAVE_CPU?
+	agregar_a_paquete (send_handshake, valor_KERNEL , strlen(valor_KERNEL)+1); 
 
 	while(flag){
 		enviar_paquete(send_handshake, conexion);
@@ -97,7 +98,7 @@ void conexion_memoria(char* puerto)
 	close(server);
 	close(cliente);
 }
-
+/*
 void Fetch(){
 	//esperarProximaInstruccion();
 
@@ -114,16 +115,16 @@ void execute()
 	op = "set";
 	switch(op){
 		case "set":
-			SET();
+			SET(Registro,Valor);
 			break;
 		case "sum":
-			SUN();
+			SUM(Destino, Origen);
 			break;
 		case "sub":
-			SUB();
+			SUB(Destino, Origen);
 			break;
 		case "jnz":
-			JNZ();
+			JNZ(Registro,Instrucción);
 			break;
 		/*case "io_gen_sleep":
 			IO_GEN_SLEEP();
@@ -145,7 +146,7 @@ void JNZ(RegistroCPU Registro, int Instrucción){
 		Registro<-PC = Instrucción;
 	}
 }
-/*
+
 void IO_GEN_SLEEP(char Interfaz, int Unidadestrabajo){
 }
 */

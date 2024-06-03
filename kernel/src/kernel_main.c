@@ -109,6 +109,7 @@ void cliente_conexion_IO(char * puerto, char * ip){
 	char *valor_IO;
 	valor_IO = config_get_string_value(config_global, "CLAVE_KERNEL");
 
+	//sem_wait(server_kernel_cpu);
 	conexion_IO_KERNEL = crear_conexion(ip, puerto);
 	send_handshake_io = crear_paquete(HANDSHAKE);
 	agregar_a_paquete (send_handshake_io,valor_IO, strlen(valor_IO)+1); 
