@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "cpu_main.h"
 
+t_config* config_global;
 
 int main(void) {
     
@@ -15,43 +16,53 @@ int main(void) {
 	pthread_t tid_memoria;
 	pthread_t tid_kernel;
 	char *ret_value;
+	char *puerto_memoria;
+	char *arg_kernel[2]; // [PUERTO | IP]
 	
 
     //int socket_id = iniciar_servidor();
     config_global = config_create("../utils/config/config_global.config");
 
+	puerto_memoria = config_get_string_value(config_global, "PUERTO_CPU->MEMORIA");
+	arg_kernel[0] = config_get_string_value(config_global, "PUERTO_KERNEL->CPU");
+	arg_kernel[1] = config_get_string_value(config_global, "IP_KERNEL");
+
+
 	//conexiones
-	pthread_create(&tid_memoria, NULL, thread_crear_conexion_server, CPU_MEMORIA);
-	pthread_create(&tid_kernel, NULL, thread_crear_conexion_cliente, KERNEL_CPU);
+	pthread_create(&tid_memoria, NULL, conexion_memoria, puerto_memoria);
+	pthread_create(&tid_kernel, NULL, cliente_conexion_KERNEL, arg_kernel);
 	//conexiones
 
 	//espero fin conexiones
-	pthread_join(tid_memoria, &ret_value);
-	log_info(logger, ret_value);
-	pthread_join(tid_kernel, &ret_value);
-	log_info(logger, ret_value);
+	pthread_join(tid_memoria, ret_value);
+	pthread_join(tid_kernel, ret_value);
 	//espero fin conexiones
 
 	// terminar_programa(server_fd_memoria, logger, config_global); //logger: redundante (global) pero esta definido asi en utils.h
     return 0;
 }
-void cliente_conexion_KERNEL(char * puerto, char * ip){
+void *cliente_conexion_KERNEL(char * arg_kernel[]){
 	t_paquete* send_handshake;
-	int conexion_KERNEL_CPU;
+	int server;
 	protocolo_socket op;
 	int flag=1;
-	char* valor_KERNEL;
+	char* valor_CPU;
 	
-	valor_KERNEL = config_get_string_value(config_global, "CLAVE_KERNEL");
-	// sem_wait(server_kernel_cpu); 
-	conexion_KERNEL_CPU = crear_conexion(ip, puerto);
+	log_info(logger, "Conectando a kernel");
+	log_info(logger, "IP:");
+	log_info(logger, arg_kernel[1]);
+	log_info(logger, "Puerto:");
+	log_info(logger, arg_kernel[0]);
+
+	valor_CPU = config_get_string_value(config_global, "CLAVE_CPU");
+	server = crear_conexion(arg_kernel[1], arg_kernel[0]);
 	send_handshake = crear_paquete(HANDSHAKE);
-	agregar_a_paquete (send_handshake, valor_KERNEL , strlen(valor_KERNEL)+1); 
+	agregar_a_paquete (send_handshake, valor_CPU , strlen(valor_CPU)+1); 
 
 	while(flag){
-		enviar_paquete(send_handshake, conexion_KERNEL_CPU);
 		sleep(1);
-		op = recibir_operacion(conexion_KERNEL_CPU);
+		enviar_paquete(send_handshake, server);
+		op = recibir_operacion(server);
 		switch (op)
 		{
 		case HANDSHAKE:
@@ -68,14 +79,13 @@ void cliente_conexion_KERNEL(char * puerto, char * ip){
 	}
 
 	eliminar_paquete(send_handshake);
-	liberar_conexion(conexion_KERNEL_CPU);
+	liberar_conexion(server);
 }
-void conexion_memoria(char* puerto) 
+void *conexion_memoria(char* puerto) 
 {
 	t_list *handshake;
 	int server = iniciar_servidor(puerto);
 		log_info(logger, "Servidor listo para recibir al cliente Memoria");
-		// sem_post(server_cpu_memoria);
 		int cliente = esperar_cliente(server);
 		while(true){
 			int cod_op = recibir_operacion(cliente);
@@ -99,56 +109,3 @@ void conexion_memoria(char* puerto)
 	close(server);
 	close(cliente);
 }
-
-void Fetch(){
-	//esperarProximaInstruccion();
-
-}
-
-void Decode(){
-	//ToDo interpretar qué instrucción es la que se va a ejecutar y si requiere de una traducción de dirección lógica a dirección física.
-	execute();
-	// [número_pagina | desplazamiento] paginacion
-}
-/*
-void execute(){ -------------- FACU ARREGLA ESTO :)
-	 
-	switch(t_operaciones){
-		case "SET":
-			SET( registro,Valor);
-			break;
-		case "SUM":
-			SUM( Destino,Origen);
-			break;
-		case "SUB":
-			SUB( Destino,Origen);
-			break;
-		case "JNZ":
-			JNZ( Registro,Instrucción);
-			break;
-		case "IO_GEN_SLEEP":
-			IO_GEN_SLEEP();
-			break;
-		default:
-	}
-}
-
-void SET(RegistroCPU Registro,int Valor){
-	Registro = Valor;
-}
-void SUM(RegistroCPU Destino, RegistroCPU Origen){
-	Destino = Destino + Origen;
-}
-void SUB(RegistroCPU Destino, RegistroCPU Origen){
-	Destino = Destino - Origen;
-}
-void JNZ(RegistroCPU Registro, int Instrucción){
-	if (RegistroCPU!=0){//VALOR DEL REGISTRO DISTINTO A 0
-		Registro<-PC = Instrucción;
-	}
-}
-
-void IO_GEN_SLEEP(char Interfaz, int Unidadestrabajo){
-}
-*/
-
