@@ -22,10 +22,10 @@ int main(int argc, char* argv[]) {
 	//conexiones
 
 	//espero fin conexiones
-	pthread_join(tid_kernel, ret_value);
-	log_info(ret_value);
-	pthread_join(tid_memoria, ret_value);
-	log_info(ret_value);
+	pthread_join(tid_kernel,&ret_value);
+	log_info(logger, ret_value);
+	pthread_join(tid_memoria,&ret_value);
+	log_info(logger, ret_value);
 	//espero fin conexiones
 
     return 0;
@@ -37,7 +37,7 @@ void conexion_kernel(char* puerto)
 
 	int server = iniciar_servidor(puerto);
 		log_info(logger, "Servidor listo para recibir al cliente CPU");
-		sem_post(server_io_kernel);
+		//sem_post(server_io_kernel);
 		int cliente = esperar_cliente(server);
 		while(true){
 			int cod_op = recibir_operacion(cliente);
@@ -67,7 +67,7 @@ void conexion_memoria(char* puerto)
 
 	int server = iniciar_servidor(puerto);
 		log_info(logger, "Servidor listo para recibir al cliente CPU");
-		sem_post(server_io_memoria); //condicion de carrera entre esperar_cliente de io y crear_conexion de memoria?
+		//sem_post(server_io_memoria); //condicion de carrera entre esperar_cliente de io y crear_conexion de memoria?
 		int cliente = esperar_cliente(server);
 		while(true){
 			int cod_op = recibir_operacion(cliente);

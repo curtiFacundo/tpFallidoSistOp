@@ -8,15 +8,28 @@
 #include "../../kernel/src/pcb.h"
 #include "../../utils/src/utils.h"
 
-
+typedef enum  
+{
+    SET,
+    SUB,
+    SUM,
+    JNZ,
+    IO_GEN_SLEEP,
+    MOV_IN,
+    MOV_OUT,
+    RESIZE,
+    COPY_STRING,
+    IO_STDIN_READ,
+    IO_STDIN_WRITE,
+}t_operaciones;
 
 void cliente_conexion_KERNEL(char *, char *);
 void conexion_memoria(char*);
 void levantar_conexiones();
-/*
+
 void Fetch();
 void Decode();
-
+/*
 void SET (RegistroCPU,int *); //Asigna al registro el valor pasado como parámetro.
 void SUM (RegistroCPU,RegistroCPU); //Suma al Registro Destino el Registro Origen y deja el resultado en el Registro Destino.
 void SUB (RegistroCPU,RegistroCPU); //Resta al Registro Destino el Registro Origen y deja el resultado en el Registro Destino.

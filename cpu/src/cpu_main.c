@@ -26,36 +26,36 @@ int main(void) {
 	//conexiones
 
 	//espero fin conexiones
-	pthread_join(tid_memoria, ret_value);
-	log_info(ret_value);
-	pthread_join(tid_kernel, ret_value);
-	log_info(ret_value);
+	pthread_join(tid_memoria, &ret_value);
+	log_info(logger, ret_value);
+	pthread_join(tid_kernel, &ret_value);
+	log_info(logger, ret_value);
 	//espero fin conexiones
 
-	terminar_programa(server_fd_memoria, logger, config_global); //logger: redundante (global) pero esta definido asi en utils.h
+	// terminar_programa(server_fd_memoria, logger, config_global); //logger: redundante (global) pero esta definido asi en utils.h
     return 0;
 }
 void cliente_conexion_KERNEL(char * puerto, char * ip){
 	t_paquete* send_handshake;
-	int conexion;
+	int conexion_KERNEL_CPU;
 	protocolo_socket op;
 	int flag=1;
 	char* valor_KERNEL;
 	
-	valor_IO = config_get_string_value(config_global, "CLAVE_CPU");
+	valor_KERNEL = config_get_string_value(config_global, "CLAVE_KERNEL");
 	// sem_wait(server_kernel_cpu); 
-	send_han = crear_conexion(ip, puerto);
+	conexion_KERNEL_CPU = crear_conexion(ip, puerto);
 	send_handshake = crear_paquete(HANDSHAKE);
 	agregar_a_paquete (send_handshake, valor_KERNEL , strlen(valor_KERNEL)+1); 
 
 	while(flag){
-		enviar_paquete(send_handshake, conexion);
+		enviar_paquete(send_handshake, conexion_KERNEL_CPU);
 		sleep(1);
-		op = recibir_operacion(conexion);
+		op = recibir_operacion(conexion_KERNEL_CPU);
 		switch (op)
 		{
 		case HANDSHAKE:
-			log_info("recibi handshake de KERNEL");
+			log_info(logger, "recibi handshake de KERNEL");
 			break;
 		
 		case TERMINATE:
@@ -68,13 +68,14 @@ void cliente_conexion_KERNEL(char * puerto, char * ip){
 	}
 
 	eliminar_paquete(send_handshake);
-	liberar_conexion(conexion);
+	liberar_conexion(conexion_KERNEL_CPU);
 }
 void conexion_memoria(char* puerto) 
 {
+	t_list *handshake;
 	int server = iniciar_servidor(puerto);
 		log_info(logger, "Servidor listo para recibir al cliente Memoria");
-		sem_post(server_cpu_memoria);
+		// sem_post(server_cpu_memoria);
 		int cliente = esperar_cliente(server);
 		while(true){
 			int cod_op = recibir_operacion(cliente);
@@ -98,7 +99,7 @@ void conexion_memoria(char* puerto)
 	close(server);
 	close(cliente);
 }
-/*
+
 void Fetch(){
 	//esperarProximaInstruccion();
 
@@ -109,29 +110,29 @@ void Decode(){
 	execute();
 	// [número_pagina | desplazamiento] paginacion
 }
-void execute()
-{
-    char op;
-	op = "set";
-	switch(op){
-		case "set":
-			SET(Registro,Valor);
+/*
+void execute(){ -------------- FACU ARREGLA ESTO :)
+	 
+	switch(t_operaciones){
+		case "SET":
+			SET( registro,Valor);
 			break;
-		case "sum":
-			SUM(Destino, Origen);
+		case "SUM":
+			SUM( Destino,Origen);
 			break;
-		case "sub":
-			SUB(Destino, Origen);
+		case "SUB":
+			SUB( Destino,Origen);
 			break;
-		case "jnz":
-			JNZ(Registro,Instrucción);
+		case "JNZ":
+			JNZ( Registro,Instrucción);
 			break;
-		/*case "io_gen_sleep":
+		case "IO_GEN_SLEEP":
 			IO_GEN_SLEEP();
 			break;
-		*/
+		default:
 	}
 }
+
 void SET(RegistroCPU Registro,int Valor){
 	Registro = Valor;
 }

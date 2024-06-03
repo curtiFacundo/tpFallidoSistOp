@@ -25,36 +25,38 @@ int main(void) {
 	//conexiones
 
 	//espero fin conexiones
-	pthread_join(tid_kernel, ret_value);
-	log_info(ret_value);
-	pthread_join(tid_cpu, ret_value);
-	log_info(ret_value);
-	pthread_join(tid_io, ret_value);
-	log_info(ret_value);
+	pthread_join(tid_kernel,&ret_value);
+	log_info(logger, ret_value);
+	pthread_join(tid_cpu,&ret_value);
+	log_info(logger, ret_value);
+	pthread_join(tid_io,&ret_value);
+	log_info(logger, ret_value);
 	//espero fin conexiones
 
 	return 0;
 }
 void cliente_conexion_IO(char * puerto, char * ip){
 	t_paquete* send_handshake;
-	int conexion_IO;
+	int conexion_IO_MEMORIA;
 	protocolo_socket op;
 	int flag=1;
+	//char* valor_IO;
 
-	sem_wait(server_io_memoria);
+	//sem_wait(server_io_memoria);
 	//sleep?
-	conexion_IO = crear_conexion(ip, puerto);
+	//valor_IO = config_get_string_value(config_global, "CLAVE_IO");
+	conexion_IO_MEMORIA = crear_conexion(ip, puerto);
 	send_handshake = crear_paquete(HANDSHAKE);
-	agregar_a_paquete (send_handshake, "hola soy memoria", 16+1);
+	//agregar_a_paquete (send_handshake, valor_IO , strlen(valor_IO)+1);
 
 	while(flag){
-		enviar_paquete(send_handshake, conexion_IO);
+		enviar_paquete(send_handshake, conexion_IO_MEMORIA);
 		sleep(1);
-		op = recibir_operacion(conexion_IO);
+		op = recibir_operacion(conexion_IO_MEMORIA);
 		switch (op)
 		{
 		case HANDSHAKE:
-			log_info("recibi handshake de IO");
+			log_info(logger,"recibi handshake de IO");
 			break;
 		
 		case TERMINATE:
@@ -67,27 +69,28 @@ void cliente_conexion_IO(char * puerto, char * ip){
 	}
 
 	eliminar_paquete(send_handshake);
-	liberar_conexion(conexion_IO);
+	liberar_conexion(conexion_IO_MEMORIA);
 }
 void cliente_conexion_CPU(char * puerto, char * ip){
 	t_paquete* send_handshake;
-	int conexion_IO;
+	int conexion_CPU_MEMORIA;
 	protocolo_socket op;
 	int flag=1;
-
-	sem_wait(server_cpu_memoria);
-	conexion_IO = crear_conexion(ip, puerto);
+	//char* valor_CPU;
+	//sem_wait(server_cpu_memoria);
+	//valor_CPU = config_get_string_value(config_global, "CLAVE_MEMORIA");
+	conexion_CPU_MEMORIA = crear_conexion(ip, puerto);
 	send_handshake = crear_paquete(HANDSHAKE);
-	agregar_a_paquete (send_handshake, "hola soy memoria", 16+1);
+	//agregar_a_paquete (send_handshake, valor_CPU, strlen(valor_CPU)+1);
 
 	while(flag){
-		enviar_paquete(send_handshake, conexion_IO);
+		enviar_paquete(send_handshake, conexion_CPU_MEMORIA);
 		sleep(1);
-		op = recibir_operacion(conexion_IO);
+		op = recibir_operacion(conexion_CPU_MEMORIA);
 		switch (op)
 		{
 		case HANDSHAKE:
-			log_info("recibi handshake de CPU");
+			log_info(logger,"recibi handshake de CPU");
 			break;
 		
 		case TERMINATE:
@@ -100,27 +103,27 @@ void cliente_conexion_CPU(char * puerto, char * ip){
 	}
 
 	eliminar_paquete(send_handshake);
-	liberar_conexion(conexion_IO);
+	liberar_conexion(conexion_CPU_MEMORIA);
 }
 void cliente_conexion_KERNEL(char * puerto, char * ip){
 	t_paquete* send_handshake;
-	int conexion_IO;
+	int conexion_KERNEL_MEMORIA;
 	protocolo_socket op;
 	int flag=1;
-
-	sem_wait(server_kernel_memoria);
-	conexion_IO = crear_conexion(ip, puerto);
+	
+	//sem_wait(server_kernel_memoria);
+	conexion_KERNEL_MEMORIA = crear_conexion(ip, puerto);
 	send_handshake = crear_paquete(HANDSHAKE);
-	agregar_a_paquete (send_handshake, "hola soy memoria", 16+1);
+	//agregar_a_paquete (send_handshake, "hola soy memoria", 16+1);
 
 	while(flag){
-		enviar_paquete(send_handshake, conexion_IO);
+		enviar_paquete(send_handshake, conexion_KERNEL_MEMORIA);
 		sleep(1);
-		op = recibir_operacion(conexion_IO);
+		op = recibir_operacion(conexion_KERNEL_MEMORIA);
 		switch (op)
 		{
 		case HANDSHAKE:
-			log_info("recibi handshake de KERNEL");
+			log_info(logger, "recibi handshake de KERNEL");
 			break;
 		
 		case TERMINATE:
@@ -133,5 +136,5 @@ void cliente_conexion_KERNEL(char * puerto, char * ip){
 	}
 
 	eliminar_paquete(send_handshake);
-	liberar_conexion(conexion_IO);
+	liberar_conexion(conexion_KERNEL_MEMORIA);
 }
