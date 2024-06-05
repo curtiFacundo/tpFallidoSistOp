@@ -2,8 +2,6 @@
 #include <stdio.h>
 #include "cpu_main.h"
 
-t_config* config_global;
-
 int main(void) {
     
 	/*
@@ -83,18 +81,29 @@ void *cliente_conexion_KERNEL(char * arg_kernel[]){
 }
 void *conexion_memoria(char* puerto) 
 {
-	t_list *handshake;
+	t_paquete *handshake_send;
+	t_paquete *handshake_recv;
+	char * handshake_texto = "handshake";
+	
 	int server = iniciar_servidor(puerto);
-		log_info(logger, "Servidor listo para recibir al cliente Memoria");
+		log_info(logger, "Servidor listo para recibir al cliente MEMORIA");
 		int cliente = esperar_cliente(server);
+
+	//HANDSHAKE
+	handshake_send = crear_paquete(HANDSHAKE);
+	agregar_a_paquete (handshake_send, handshake_texto , strlen(handshake_texto)+1);
+	//HANDSHAKE_end
+
+
 		while(true){
 			int cod_op = recibir_operacion(cliente);
 			switch (cod_op)
 			{
 				case HANDSHAKE:
-					handshake = recibir_paquete(cliente);
+					handshake_recv = recibir_paquete(cliente);
 					log_info(logger, "me llego:\n");
-					list_iterate(handshake, (void*) iterator); //no se como funciona esto 💁🏼
+					list_iterate(handshake_recv, (void*) iterator);
+					enviar_paquete(handshake_send, cliente);
 					break;
 				case -1:
 					log_error(logger, "el cliente se desconecto. Terminando servidor");

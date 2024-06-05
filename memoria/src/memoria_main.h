@@ -9,8 +9,8 @@
 #include "../../utils/src/utils.h"
 
 int Saludar(void);
-void cliente_conexion_IO(char *, char * );
-void cliente_conexion_CPU(char *, char * );
-void cliente_conexion_KERNEL(char *, char * );
+void *cliente_conexion_IO(char **);
+void *cliente_conexion_CPU(char **);
+void *cliente_conexion_KERNEL(char **);
 
 #endif /* MEMORIA_MAIN_H_ */

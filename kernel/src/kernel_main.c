@@ -3,8 +3,6 @@
 #include <semaphore.h>
 #include "kernel_main.h"
 
-t_config* config_global;
-
 
 int main(int argc, char* argv[]) 
 {    
@@ -30,7 +28,7 @@ int main(int argc, char* argv[])
 	//conexiones
 	pthread_create(&tid_memoria, NULL, conexion_memoria, puerto_memoria);
 	pthread_create(&tid_cpu, NULL, conexion_cpu, puerto_cpu);
-	//pthread_create(&tid_io, NULL, cliente_conexion_IO, arg_io);
+	pthread_create(&tid_io, NULL, cliente_conexion_IO, arg_io);
 	//conexiones
 
 	//espero fin conexiones
@@ -83,23 +81,34 @@ void *conexion_cpu(char* puerto)
 }
 void *conexion_memoria(char* puerto) 
 {
-	t_list *handshake;
+	t_paquete *handshake_send;
+	t_paquete *handshake_recv;
+	char * handshake_texto = "handshake";
+	
 	int server = iniciar_servidor(puerto);
 		log_info(logger, "Servidor listo para recibir al cliente MEMORIA");
 		int cliente = esperar_cliente(server);
+
+	//HANDSHAKE
+	handshake_send = crear_paquete(HANDSHAKE);
+	agregar_a_paquete (handshake_send, handshake_texto , strlen(handshake_texto)+1);
+	//HANDSHAKE_end
+
+
 		while(true){
 			int cod_op = recibir_operacion(cliente);
 			switch (cod_op)
 			{
 				case HANDSHAKE:
-					handshake = recibir_paquete(cliente);
+					handshake_recv = recibir_paquete(cliente);
 					log_info(logger, "me llego:\n");
-					list_iterate(handshake, (void*) iterator); //no se como funciona esto 💁🏼
+					list_iterate(handshake_recv, (void*) iterator);
+					enviar_paquete(handshake_send, cliente);
 					break;
 				case -1:
-						log_error(logger, "el cliente se desconecto. Terminando servidor");
-						return;
-						break;
+					log_error(logger, "el cliente se desconecto. Terminando servidor");
+					return EXIT_FAILURE;
+					break;
 				default:
 					log_warning(logger,"Operacion desconocida. No quieras meter la pata");
 					break;
@@ -119,7 +128,14 @@ void *cliente_conexion_IO(char * arg_io[]){
 	char *valor_IO;
 	valor_IO = config_get_string_value(config_global, "CLAVE_KERNEL");
 
-	conexion_IO_KERNEL = crear_conexion(arg_io[1], arg_io[0]);
+	do
+	{
+		conexion_IO_KERNEL = crear_conexion(arg_io[1], arg_io[0]);
+		sleep(1);
+
+	}while(conexion_IO_KERNEL == -1);
+	
+	
 	send_handshake_io = crear_paquete(HANDSHAKE);
 	agregar_a_paquete (send_handshake_io,valor_IO, strlen(valor_IO)+1); 
 
