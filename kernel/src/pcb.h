@@ -1,4 +1,5 @@
 #include  <stdint.h> // asegura que usamos tipos de enteros estándar 
+#include <utils.h>
 typedef enum  
 {
     NEW,
@@ -25,12 +26,17 @@ typedef struct{
 }RegistroCPU; // dice registros generales, supongo que se refiere a hacer esto :calavera:
 typedef struct{
     int pid; // id del proceso
-    int* pc_id; // id program counter 
+    int pc; // id program counter 
     int quantum; 
-    int estado; // t_estado
+    t_estado estado; // t_estado
     t_list* instrucciones;
-    RegistroCPU registros;
+    RegistroCPU* registros;
 }pcb;
 
 
-pcb* crear_pcb(int pid, int pc_id, int quantum, RegistroCPU registros, t_list* instrucciones);
+pcb* crear_pcb(int pid, int quantum, RegistroCPU registros, t_list* instrucciones);
+pcb* armar_pcb(int pc, int pid, int quantum, RegistroCPU registros, t_list* instrucciones,t_estado estado);
+void eliminar_PCB(pcb* pcb_p);
+void cambiar_estado(pcb* pcb_p, int estado);
+void element_destroyer(void* elemento);
+
