@@ -1,9 +1,11 @@
-#include <utils/utils.h>
+#include <utils.h>
 
 //defines de operaciones
 #define OPERACION1 0
 
 t_log* logger;
+t_config* config_global;
+
 
 void decir_hola(char* quien) {
     printf("Hola desde %s!!\n", quien);
@@ -48,11 +50,11 @@ void decir_hola(char* quien) {
     int recibir_operacion(int socket_cliente)
     {
         int cod_op;
-        if(recv(socket_cliente, &cod_op, sizeof(int), MSG_WAITALL) > 0)
+        if(recv(socket_cliente, &cod_op, sizeof(int), MSG_WAITALL) > 0) //function block hasta que llegue un paquete
             return cod_op;
         else
         {
-            close(socket_cliente);
+            close(socket_cliente); //cierra la conexion si la conexion no existe
             return -1;
         }
     }
@@ -113,7 +115,7 @@ void decir_hola(char* quien) {
         return magic;
     }
 
-    int crear_conexion(char *ip, char* puerto, t_log *logger)
+    int crear_conexion(char *ip, char* puerto)
     {
         struct addrinfo hints;
         struct addrinfo *server_info;
@@ -132,6 +134,7 @@ void decir_hola(char* quien) {
 
         if (connect(socket_cliente, server_info->ai_addr, server_info->ai_addrlen)==-1){
             log_error(logger, "no se pudo establecer conexion al servidor");
+            return -1;
         }else log_info(logger, "Conectado al servidor");
 
         freeaddrinfo(server_info);
@@ -143,7 +146,7 @@ void decir_hola(char* quien) {
     {
         t_paquete* paquete = malloc(sizeof(t_paquete));
 
-        paquete->codigo_operacion = MENSAJE;
+        paquete->codigo_operacion = MENSAJE;config_get_string_value(config_global, "IP_CPU");
         paquete->buffer = malloc(sizeof(t_buffer));
         paquete->buffer->size = strlen(mensaje) + 1;
         paquete->buffer->stream = malloc(paquete->buffer->size);

@@ -6,9 +6,11 @@
 #include <string.h>
 #include <commons/log.h>
 
-#include "../../utils/src/utils/utils.h"
+#include "../../utils/src/utils.h"
 
 int Saludar(void);
-int main(void);
+void *cliente_conexion_IO(char **);
+void *cliente_conexion_CPU(char **);
+void *cliente_conexion_KERNEL(char **);
 
 #endif /* MEMORIA_MAIN_H_ */
