@@ -156,7 +156,7 @@ void *cliente_conexion_KERNEL(char * arg_kernel[]){
 		switch (op)
 		{
 		case HANDSHAKE:
-			log_info(logger, "recibi handshake de CPU");
+			log_info(logger, "recibi handshake de KERNEL");
 			break;
 		
 		case TERMINATE:
