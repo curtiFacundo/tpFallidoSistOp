@@ -1,3 +1,6 @@
+#ifndef PCB_H_
+#define PCB_H_
+
 #include  <stdint.h> // asegura que usamos tipos de enteros estándar 
 #include <utils.h>
 typedef enum  
@@ -40,3 +43,5 @@ void eliminar_PCB(pcb* pcb_p);
 void cambiar_estado(pcb* pcb_p, t_estado estado);
 void element_destroyer(void* elemento);
 
+
+#endif /* CORTO_PLAZO_H_ */
