@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include "cpu_main.h"
 
-
 int main(void) {
     
 	/*
@@ -15,46 +14,57 @@ int main(void) {
 	pthread_t tid_memoria;
 	pthread_t tid_kernel;
 	char *ret_value;
+	char *puerto_memoria;
+	char *arg_kernel[2]; // [PUERTO | IP]
 	
 
     //int socket_id = iniciar_servidor();
     config_global = config_create("../utils/config/config_global.config");
 
+	puerto_memoria = config_get_string_value(config_global, "PUERTO_CPU->MEMORIA");
+	arg_kernel[0] = config_get_string_value(config_global, "PUERTO_KERNEL->CPU");
+	arg_kernel[1] = config_get_string_value(config_global, "IP_KERNEL");
+
+
 	//conexiones
-	pthread_create(&tid_memoria, NULL, thread_crear_conexion_server, CPU_MEMORIA);
-	pthread_create(&tid_kernel, NULL, thread_crear_conexion_cliente, KERNEL_CPU);
+	pthread_create(&tid_memoria, NULL, conexion_memoria, puerto_memoria);
+	pthread_create(&tid_kernel, NULL, cliente_conexion_KERNEL, arg_kernel);
 	//conexiones
 
 	//espero fin conexiones
 	pthread_join(tid_memoria, ret_value);
-	log_info(ret_value);
 	pthread_join(tid_kernel, ret_value);
-	log_info(ret_value);
 	//espero fin conexiones
 
-	terminar_programa(server_fd_memoria, logger, config_global); //logger: redundante (global) pero esta definido asi en utils.h
+	// terminar_programa(server_fd_memoria, logger, config_global); //logger: redundante (global) pero esta definido asi en utils.h
     return 0;
 }
-void cliente_conexion_KERNEL(char * puerto, char * ip){
+void *cliente_conexion_KERNEL(char * arg_kernel[]){
 	t_paquete* send_handshake;
-	int conexion;
+	int server;
 	protocolo_socket op;
 	int flag=1;
-	char* valor_KERNEL;
+	char* valor_CPU;
 	
-	sem_wait(server_kernel_cpu);
-	conexion = crear_conexion(ip, puerto);
+	log_info(logger, "Conectando a kernel");
+	log_info(logger, "IP:");
+	log_info(logger, arg_kernel[1]);
+	log_info(logger, "Puerto:");
+	log_info(logger, arg_kernel[0]);
+
+	valor_CPU = config_get_string_value(config_global, "CLAVE_CPU");
+	server = crear_conexion(arg_kernel[1], arg_kernel[0]);
 	send_handshake = crear_paquete(HANDSHAKE);
-	agregar_a_paquete (send_handshake, valor_KERNEL , strlen(valor_KERNEL)+1); // no seria CLAVE_CPU?
+	agregar_a_paquete (send_handshake, valor_CPU , strlen(valor_CPU)+1); 
 
 	while(flag){
-		enviar_paquete(send_handshake, conexion);
 		sleep(1);
-		op = recibir_operacion(conexion);
+		enviar_paquete(send_handshake, server);
+		op = recibir_operacion(server);
 		switch (op)
 		{
 		case HANDSHAKE:
-			log_info("recibi handshake de KERNEL");
+			log_info(logger, "recibi handshake de KERNEL");
 			break;
 		
 		case TERMINATE:
@@ -67,22 +77,33 @@ void cliente_conexion_KERNEL(char * puerto, char * ip){
 	}
 
 	eliminar_paquete(send_handshake);
-	liberar_conexion(conexion);
+	liberar_conexion(server);
 }
-void conexion_memoria(char* puerto) 
+void *conexion_memoria(char* puerto) 
 {
+	t_paquete *handshake_send;
+	t_paquete *handshake_recv;
+	char * handshake_texto = "handshake";
+	
 	int server = iniciar_servidor(puerto);
-		log_info(logger, "Servidor listo para recibir al cliente Memoria");
-		sem_post(server_cpu_memoria);
+		log_info(logger, "Servidor listo para recibir al cliente MEMORIA");
 		int cliente = esperar_cliente(server);
+
+	//HANDSHAKE
+	handshake_send = crear_paquete(HANDSHAKE);
+	agregar_a_paquete (handshake_send, handshake_texto , strlen(handshake_texto)+1);
+	//HANDSHAKE_end
+
+
 		while(true){
 			int cod_op = recibir_operacion(cliente);
 			switch (cod_op)
 			{
 				case HANDSHAKE:
-					handshake = recibir_paquete(cliente);
+					handshake_recv = recibir_paquete(cliente);
 					log_info(logger, "me llego:\n");
-					list_iterate(handshake, (void*) iterator); //no se como funciona esto 💁🏼
+					list_iterate(handshake_recv, (void*) iterator);
+					enviar_paquete(handshake_send, cliente);
 					break;
 				case -1:
 					log_error(logger, "el cliente se desconecto. Terminando servidor");
@@ -97,56 +118,3 @@ void conexion_memoria(char* puerto)
 	close(server);
 	close(cliente);
 }
-
-void Fetch(){
-	//esperarProximaInstruccion();
-
-}
-
-void Decode(){
-	//ToDo interpretar qué instrucción es la que se va a ejecutar y si requiere de una traducción de dirección lógica a dirección física.
-	execute();
-	// [número_pagina | desplazamiento] paginacion
-}
-void execute()
-{
-    char op;
-	op = "set";
-	switch(op){
-		case "set":
-			SET();
-			break;
-		case "sum":
-			SUN();
-			break;
-		case "sub":
-			SUB();
-			break;
-		case "jnz":
-			JNZ();
-			break;
-		/*case "io_gen_sleep":
-			IO_GEN_SLEEP();
-			break;
-		*/
-	}
-}
-void SET(RegistroCPU Registro,int Valor){
-	Registro = Valor;
-}
-void SUM(RegistroCPU Destino, RegistroCPU Origen){
-	Destino = Destino + Origen;
-}
-void SUB(RegistroCPU Destino, RegistroCPU Origen){
-	Destino = Destino - Origen;
-}
-void JNZ(RegistroCPU Registro, int Instrucción){
-	if (RegistroCPU!=0){//VALOR DEL REGISTRO DISTINTO A 0
-		Registro<-PC = Instrucción;
-	}
-}
-/*
-void IO_GEN_SLEEP(char Interfaz, int Unidadestrabajo){
-}
-*/
-

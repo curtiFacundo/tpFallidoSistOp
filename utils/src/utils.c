@@ -4,6 +4,7 @@
 #define OPERACION1 0
 
 t_log* logger;
+t_config* config_global;
 
 
 void decir_hola(char* quien) {
@@ -133,6 +134,7 @@ void decir_hola(char* quien) {
 
         if (connect(socket_cliente, server_info->ai_addr, server_info->ai_addrlen)==-1){
             log_error(logger, "no se pudo establecer conexion al servidor");
+            return -1;
         }else log_info(logger, "Conectado al servidor");
 
         freeaddrinfo(server_info);
@@ -240,114 +242,3 @@ void terminar_programa(int conexion, t_log* logger, t_config* config)
 void iterator(char* value) {
 	log_info(logger,"%s", value);
 }
-
-//THREADS
-void *thread_crear_conexion_server(void *arg) {
-  //return value
-  char ret[1000];
-  strcpy(ret, "Error de thread -> argumento invalido");
-  switch((tipo_conexion) arg){
-    case KERNEL_CPU:
-        conexion_cpu(config_get_string_value(config_global, "PUERTO_KERNEL->CPU"));
-        strcpy(ret, "Se finalizo el thread conexion Kernel_CPU");
-        pthread_exit(ret);
-        break;
-    
-    case KERNEL_MEMORIA:
-        conexion_memoria(config_get_string_value(config_global, "PUERTO_KERNEL->MEMORIA"));
-        strcpy(ret, "Se finalizo el thread conexion Kernel_MEMORIA");
-        pthread_exit(ret);
-        break;
-
-    case CPU_MEMORIA:
-        #ifdef CPU_MAIN_H_
-        conexion_memoria(config_get_string_value(config_global, "PUERTO_CPU->MEMORIA"));
-        strcpy(ret, "Se finalizo el thread conexion CPU_MEMORIA");
-        #endif
-        pthread_exit(ret);
-        break;
-
-    case IO_KERNEL:
-        #ifdef IO_MAIN_H_
-        conexion_kernel(config_get_string_value(config_global, "PUERTO_IO->KERNEL"));
-        strcpy(ret, "Se finalizo el thread conexion IO->KERNEL");
-        #endif
-        pthread_exit(ret);
-        break;
-
-    case IO_MEMORIA:
-        #ifdef IO_MAIN_H_
-        conexion_memoria(config_get_string_value(config_global, "PUERTO_IO->MEMORIA"));
-        strcpy(ret, "Se finalizo el thread conexion IO->MEMORIA");
-        #endif
-        pthread_exit(ret);
-        break;
-
-  }
-  strcpy(ret, "Mensaje finalizacion placeholder");
-  pthread_exit(ret);
-}
-void *thread_crear_conexion_cliente(void *arg) {
-  //return value
-  char ret[100];
-  strcpy(ret, "Error de thread -> argumento invalido");
-  switch((tipo_conexion) arg){
-    case KERNEL_CPU:
-        #ifdef CPU_MAIN_H_
-        cliente_conexion_KERNEL(
-                config_get_string_value(config_global, "PUERTO_KERNEL->CPU"),
-                config_get_string_value(config_global, "IP_KERNEL"));
-
-        strcpy(ret, "Se finalizo el thread conexion Kernel_CPU");
-        #endif
-        pthread_exit(ret);
-        break;
-    
-    case KERNEL_MEMORIA:
-        #ifdef MEMORIA_MAIN_H_
-        cliente_conexion_KERNEL(    
-            config_get_string_value(config_global, "PUERTO_KERNEL->MEMORIA"),
-            config_get_string_value(config_global, "IP_KERNEL"));
-
-        strcpy(ret, "Se finalizo el thread conexion KERNEL_MEMORIA");
-        #endif
-        pthread_exit(ret);
-        break;
-
-    case CPU_MEMORIA:
-        #ifdef MEMORIA_MAIN_H_
-        cliente_conexion_CPU(
-            config_get_string_value(config_global, "PUERTO_CPU->MEMORIA"),
-            config_get_string_value(config_global, "IP_CPU"));
-
-        strcpy(ret, "Se finalizo el thread conexion CPU_MEMORIA");
-        #endif
-        pthread_exit(ret);
-        break;
-
-    case IO_KERNEL:
-        
-        cliente_conexion_IO(
-        config_get_string_value(config_global, "PUERTO_IO->KERNEL"),
-        config_get_string_value(config_global, "IP_IO"));
-
-        strcpy(ret, "Se finalizo el thread conexion IO_KERNEL");
-
-        pthread_exit(ret);
-        break;
-
-    case IO_MEMORIA:
-        #ifdef MEMORIA_MAIN_H_
-        cliente_conexion_IO(
-            config_get_string_value(config_global, "PUERTO_IO->MEMORIA"),
-            config_get_string_value(config_global, "IP_IO"));
-
-        strcpy(ret, "Se finalizo el thread conexion IO_MEMORIA");
-        #endif
-        pthread_exit(ret);
-        break;
-
-  }
-  pthread_exit(ret);
-}
-//THREADS
