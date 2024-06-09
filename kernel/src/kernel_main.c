@@ -3,14 +3,16 @@
 #include <semaphore.h>
 #include "kernel_main.h"
 
+int socket_cliente_cpu;
 
 int main(int argc, char* argv[]) 
 {    
 
-
 	pthread_t tid_memoria;
 	pthread_t tid_cpu;
 	pthread_t tid_io;
+	pthread_t tid_scheduler;
+
 	char *ret_value;
 	char *puerto_memoria;
 	char *puerto_cpu;
@@ -20,12 +22,17 @@ int main(int argc, char* argv[])
 	logger = log_create("kernel.log", "Kernel", 1, LOG_LEVEL_DEBUG);
     config_global = config_create("../utils/config/config_global.config");
    	
+	//planificador
+	pthread_create(&tid_scheduler,NULL,corto_plazo,FIFO);
+	pthread_detach(tid_scheduler);
+
+
+	//conexiones
 	puerto_memoria = config_get_string_value(config_global, "PUERTO_KERNEL->MEMORIA");
 	puerto_cpu = config_get_string_value(config_global, "PUERTO_KERNEL->CPU");
 	arg_io[0] = config_get_string_value(config_global, "PUERTO_IO->KERNEL");
 	arg_io[1] = config_get_string_value(config_global, "IP_IO");
 
-	//conexiones
 	pthread_create(&tid_memoria, NULL, conexion_memoria, puerto_memoria);
 	pthread_create(&tid_cpu, NULL, conexion_cpu, puerto_cpu);
 	pthread_create(&tid_io, NULL, cliente_conexion_IO, arg_io);
@@ -47,9 +54,9 @@ void *conexion_cpu(char* puerto)
 	char * handshake_texto = "handshake";
 	
 	int server = iniciar_servidor(puerto);
-		log_info(logger, "Servidor listo para recibir al cliente CPU");
-		int cliente = esperar_cliente(server);
-
+	log_info(logger, "Servidor listo para recibir al cliente CPU");
+	
+	socket_cliente_cpu = esperar_cliente(server);
 	//HANDSHAKE
 	handshake_send = crear_paquete(HANDSHAKE);
 	agregar_a_paquete (handshake_send, handshake_texto , strlen(handshake_texto)+1);
@@ -57,14 +64,14 @@ void *conexion_cpu(char* puerto)
 
 
 		while(true){
-			int cod_op = recibir_operacion(cliente);
+			int cod_op = recibir_operacion(socket_cliente_cpu);
 			switch (cod_op)
 			{
 				case HANDSHAKE:
-					handshake_recv = recibir_paquete(cliente);
+					handshake_recv = recibir_paquete(socket_cliente_cpu);
 					log_info(logger, "me llego:\n");
 					list_iterate(handshake_recv, (void*) iterator);
-					enviar_paquete(handshake_send, cliente);
+					enviar_paquete(handshake_send, socket_cliente_cpu);
 					break;
 				case -1:
 					log_error(logger, "el cliente se desconecto. Terminando servidor");
@@ -77,7 +84,7 @@ void *conexion_cpu(char* puerto)
 		}
 		
 	close(server);
-	close(cliente);
+	close(socket_cliente_cpu);
 }
 void *conexion_memoria(char* puerto) 
 {

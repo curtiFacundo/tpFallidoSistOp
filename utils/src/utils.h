@@ -26,12 +26,21 @@ Server -> Cliente:
 * I/O -> Memoria
 */
 
+
+//colas planificador
+extern t_list *sch_cola_ready,*sch_cola_new,*sch_cola_new_plus;
+
+//semaforos
+extern sem_t sem_p_ready;
+extern pthread_mutex_t m_cola_new, m_cola_ready, m_cola_new_plus;
+
 typedef enum
 {
     HANDSHAKE,
     MENSAJE,
     PAQUETE,
-    TERMINATE
+    TERMINATE,
+    PCB_CPU
 
 }protocolo_socket;
 
