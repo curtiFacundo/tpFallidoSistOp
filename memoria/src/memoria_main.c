@@ -2,8 +2,6 @@
 #include <stdio.h>
 #include "memoria_main.h"
 
-
-
 int Saludar(void) {
     logger = log_create("memoria.log", "memoria", 1, LOG_LEVEL_DEBUG);
 	log_info(logger,"Hola! CPU");
@@ -46,6 +44,7 @@ int main(void) {
 
 	return 0;
 }
+
 void *cliente_conexion_IO(char * arg_io[]){
 	
 	t_paquete* send_handshake_io;
@@ -61,7 +60,6 @@ void *cliente_conexion_IO(char * arg_io[]){
 		sleep(1);
 
 	}while(conexion_IO_MEMORIA == -1);
-	
 	
 	send_handshake_io = crear_paquete(HANDSHAKE);
 	agregar_a_paquete (send_handshake_io,valor_IO, strlen(valor_IO)+1); 
