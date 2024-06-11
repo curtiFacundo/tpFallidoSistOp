@@ -7,6 +7,7 @@
 #include "corto_plazo.h"
 
 extern int socket_cliente_cpu;
+extern int cliente;
 
 t_log* iniciar_logger(void);
 t_config* iniciar_config(void);

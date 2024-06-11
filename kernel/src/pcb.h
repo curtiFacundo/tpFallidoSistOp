@@ -32,9 +32,12 @@ typedef struct{
     int pid; // id del proceso
     int pc; // id program counter 
     int quantum; 
+    int tabla_paginas;
     t_estado estado; // t_estado
     t_list* instrucciones;
     RegistroCPU* registros;
+    
+
 }pcb;
 
 

@@ -4,6 +4,7 @@
 #include "kernel_main.h"
 
 int socket_cliente_cpu;
+int cliente;
 
 int main(int argc, char* argv[]) 
 {    
@@ -93,8 +94,8 @@ void *conexion_memoria(char* puerto)
 	char * handshake_texto = "handshake";
 	
 	int server = iniciar_servidor(puerto);
-		log_info(logger, "Servidor listo para recibir al cliente MEMORIA");
-		int cliente = esperar_cliente(server);
+	log_info(logger, "Servidor listo para recibir al cliente MEMORIA");
+	cliente = esperar_cliente(server);  // declaraba cliente aca "int cliente" lo saque para que sea general arriba de todo
 
 	//HANDSHAKE
 	handshake_send = crear_paquete(HANDSHAKE);
