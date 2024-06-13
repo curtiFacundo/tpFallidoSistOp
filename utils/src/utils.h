@@ -40,7 +40,9 @@ typedef enum
     MENSAJE,
     PAQUETE,
     TERMINATE,
-    PCB_CPU
+    INTERRUPCION,
+    PCB_CPU,
+    FIN_PRO
 
 }protocolo_socket;
 

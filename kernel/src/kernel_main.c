@@ -4,7 +4,7 @@
 #include "kernel_main.h"
 
 int socket_cliente_cpu;
-int cliente;
+int cliente; // cliente memoria, tendria que cambiar el nombre a un monton de variables
 
 int main(int argc, char* argv[]) 
 {    
