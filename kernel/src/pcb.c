@@ -46,17 +46,21 @@ void cambiar_estado(pcb* pcb_p, t_estado estado)
     pcb_p->estado = estado;
 }
 //Buscar procesos
-/*
+
 pcb* buscar_proceso_por_id(int pid) {
-    bool es_el_proceso(void* elemento) {
-        pcb* pcb_p = (pcb*) elemento;
-        return pcb_p->pid == pid;
-    }
-    
+
     pthread_mutex_lock(&mutex_global_process_list);
-    pcb* pcb_p = (pcb*) list_find(global_process_list, es_el_proceso);
+    pcb* pcb_p = (pcb*) list_find(global_process_list, Comparo_proceso);
     pthread_mutex_unlock(&mutex_global_process_list);
     
     return pcb_p;
 }
-*/
+
+int Comparo_proceso(void* elemento, void* pid) {
+    pcb* pcb_p = (pcb*) elemento;
+    if (ocb_p->pid == *(int*)pid)
+    {
+        return 1;
+    }
+    return 0;
+}

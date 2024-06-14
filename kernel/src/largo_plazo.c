@@ -52,10 +52,10 @@ void eliminar_proceso(pcb* pcb_p) {
     eliminar_paquete(paquete);
 
     // Actualizar el grado de multiprogramación
-   // sem_post(&sem_multiprogramacion);
+    // sem_post(&sem_multiprogramacion);
 
     // Mover un proceso de NEW a READY si es posible
-    //sem_post(&sem_largo_plazo);
+    // sem_post(&sem_largo_plazo);
 
     log_info(logger, "Proceso con id %d eliminado", pcb_p->pid);
 }
@@ -74,13 +74,13 @@ void recibir_contexto(int pid) {
     t_list* lista = recibir_paquete(socket_cliente_cpu);
     RegistroCPU* registros = list_remove(lista, 0); // contiene los registros de la CPU del proceso
     int* contador_programa = list_remove(lista, 1); // contiene el contador de programa
-/*
+
     pcb* pcb_p = buscar_proceso_por_id(pid);
     if (pcb_p != NULL) {
         *(pcb_p->registros) = *registros;
         pcb_p->pc = *contador_programa;
     }
-*/
+
     free(registros);
     free(contador_programa);
 
