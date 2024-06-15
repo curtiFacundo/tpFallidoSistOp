@@ -20,7 +20,16 @@ typedef enum
     RESIZE,
     COPY_STRING,
     IO_STDIN_READ,
-    IO_STDIN_WRITE,
+    IO_STDOUT_WRITE,
+    IO_FS_CREATE,
+    IO_FS_DELETE,
+    IO_FS_TRUNCATE,
+    IO_FS_WRITE,
+    IO_FS_READ,
+    WAIT,
+    SIGNAL,
+    EXIT,
+    INVALID_OPERATION 
 }t_operaciones;
 
 void *cliente_conexion_KERNEL(char **);

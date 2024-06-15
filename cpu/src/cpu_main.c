@@ -170,6 +170,10 @@ void decode(t_operaciones* operacion) {
             log_info(logger, "JNZ");
             log_info(logger, "Salto desde el registro %d si el registro %d no es 0", operacion->parametros[1], operacion->parametros[0]);
             break;
+		case IO_GEN_SLEEP:
+			log_info(logger, "IO_GEN_SLEEP");
+		    log_info(logger, "Espera una interfaz para hacer un sleep en segundos");
+			//FALTA RECIBIR INTERFAZ
         default:
             log_error(logger, "Instrucción desconocida");
             break;
@@ -194,9 +198,13 @@ void Execute(pcb* pcb, t_operaciones *operacion, RegistroCPU *registros) {
             if (registros[operacion->parametros[0]] != 0)
                 registros->PC = operacion->parametros[1];
             break;
+		case IO_GEN_SLEEP:
+			//FALTA RECIBIR INTERFAZ
         default:
             log_error(logger, "Instrucción desconocida");
             break;
 		proceso->pc += 1;
     }
 }
+
+void ExecuteSleep(char interfaz, int segundos)

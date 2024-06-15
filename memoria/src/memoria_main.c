@@ -19,8 +19,8 @@ int main(void) {
 	char *arg_io[2]; // [PUERTO | IP]
 	char *arg_cpu[2]; // [PUERTO | IP]
 	char *arg_kernel[2]; // [PUERTO | IP]
-
 	logger = log_create("memoria.log", "memoria", 1, LOG_LEVEL_DEBUG);
+	interpretarArchivo();
 	config_global = config_create("../utils/config/config_global.config");
 
 	arg_io[0] = config_get_string_value(config_global, "PUERTO_IO->MEMORIA");
@@ -170,4 +170,26 @@ void *cliente_conexion_KERNEL(char * arg_kernel[]){
 
 	eliminar_paquete(send_handshake_kernel);
 	liberar_conexion(conexion_CPU_MEMORIA);
+}
+
+int interpretarArchivo(){
+
+    FILE *entrada = fopen("entrada.txt", "r");
+    char linea[100]; 
+    char *token;
+    char *instrucciones[100]; // Lista secundaria para almacenar las instrucciones
+
+    while (fgets(linea, sizeof(linea), entrada) != NULL) {
+        const char* delimitador = "\n";
+        token = strtok(linea, delimitador);
+        int indice = 0; // indice para la lista secundaria
+        while (token != NULL) {
+			log_info(logger, token);
+            instrucciones[indice++] = token;
+            token = strtok(NULL, delimitador);
+        }
+    }
+    fclose(entrada); 
+
+    return 0;
 }
