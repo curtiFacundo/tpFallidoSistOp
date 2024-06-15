@@ -1,1 +1,3 @@
 SUM 1 23
+SUM 12 22
+EXIT

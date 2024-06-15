@@ -28,19 +28,19 @@ typedef enum
     IO_FS_READ,
     WAIT,
     SIGNAL,
-    EXIT,
+    SALIR,
     INVALID_OPERATION 
 }t_operaciones;
 
 void *cliente_conexion_KERNEL(char **);
 void *conexion_memoria(char*);
 void levantar_conexiones();
-
+/*
 void Fetch(pcb* pcb, t_operaciones* operacion);
 void decode(t_operaciones* operacion);
 void Execute(pcb* pcb, t_operaciones *operacion, RegistroCPU *registros);
 void CheckInterrupt();
-
+*/
 
 
 #endif /* CPU_MAIN_H_ */

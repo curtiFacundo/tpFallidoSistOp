@@ -20,7 +20,6 @@ int main(void) {
 	char *arg_cpu[2]; // [PUERTO | IP]
 	char *arg_kernel[2]; // [PUERTO | IP]
 	logger = log_create("memoria.log", "memoria", 1, LOG_LEVEL_DEBUG);
-	interpretarArchivo();
 	config_global = config_create("../utils/config/config_global.config");
 
 	arg_io[0] = config_get_string_value(config_global, "PUERTO_IO->MEMORIA");
@@ -75,7 +74,6 @@ void *cliente_conexion_IO(char * arg_io[]){
 		case HANDSHAKE:
 			log_info(logger, "recibi handshake de IO");
 			break;
-		
 		case TERMINATE:
 			flag = 0;
 			break;
@@ -88,48 +86,65 @@ void *cliente_conexion_IO(char * arg_io[]){
 	eliminar_paquete(send_handshake_io);
 	liberar_conexion(conexion_IO_MEMORIA);
 }
-void *cliente_conexion_CPU(char * arg_cpu[]){
+
+
+void *cliente_conexion_CPU(char *arg_cpu[]) {
+    t_paquete *send_handshake_cpu;
+    int conexion_CPU_MEMORIA;
+    protocolo_socket op;
+    int flag = 1;
+    char *valor_CPU;
+    valor_CPU = config_get_string_value(config_global, "CLAVE_MEMORIA");
 	
-	t_paquete* send_handshake_cpu;
-	int conexion_CPU_MEMORIA;
-	protocolo_socket op;
-	int flag=1;
-	char *valor_CPU;
-	valor_CPU = config_get_string_value(config_global, "CLAVE_MEMORIA");
+    do {
+        conexion_CPU_MEMORIA = crear_conexion(arg_cpu[1], arg_cpu[0]);
+        sleep(1);
 
-	do
-	{
-		conexion_CPU_MEMORIA = crear_conexion(arg_cpu[1], arg_cpu[0]);
-		sleep(1);
+    } while (conexion_CPU_MEMORIA == -1);
 
-	}while(conexion_CPU_MEMORIA == -1);
-	
-	
-	send_handshake_cpu = crear_paquete(HANDSHAKE);
-	agregar_a_paquete (send_handshake_cpu,valor_CPU, strlen(valor_CPU)+1); 
+    send_handshake_cpu = crear_paquete(INSTRUCCIONES);
+    agregar_a_paquete(send_handshake_cpu, valor_CPU, strlen(valor_CPU) + 1);
+	char **instrucciones = interpretarArchivo();
+    if (instrucciones == NULL) {
+        log_error(logger, "Error al interpretar el archivo");
+        eliminar_paquete(send_handshake_cpu);
+        liberar_conexion(conexion_CPU_MEMORIA);
+        return NULL;
+    }
 
-	while(flag){
-		enviar_paquete(send_handshake_cpu, conexion_CPU_MEMORIA);
-		sleep(1);
-		op = recibir_operacion(conexion_CPU_MEMORIA);
-		switch (op)
-		{
-		case HANDSHAKE:
-			log_info(logger, "recibi handshake de CPU");
-			break;
-		
-		case TERMINATE:
-			flag = 0;
-			break;
+    // Enviar las instrucciones línea por línea
+    for (int i = 0; instrucciones[i] != NULL; i++) {
+        agregar_a_paquete(send_handshake_cpu, instrucciones[i], strlen(instrucciones[i]) + 1);
+        enviar_paquete(send_handshake_cpu, conexion_CPU_MEMORIA);
+        sleep(1);
+    }
 
-		default:
-			break;
-		}
-	}
+    // Liberar la memoria asignada a las instrucciones
+    liberarInstrucciones(instrucciones);
 
-	eliminar_paquete(send_handshake_cpu);
-	liberar_conexion(conexion_CPU_MEMORIA);
+    while (flag) {
+        op = recibir_operacion(conexion_CPU_MEMORIA);
+        switch (op) {
+            case HANDSHAKE:
+                log_info(logger, "recibi handshake de CPU");
+                break;
+            case INSTRUCCIONES:
+                log_info(logger, "envio instrucciones a CPU");
+                // Aquí podrías procesar algo después de enviar todas las instrucciones
+                break;
+            case TERMINATE:
+                flag = 0;
+                break;
+            default:
+                break;
+        }
+    }
+
+    eliminar_paquete(send_handshake_cpu);
+    liberar_conexion(conexion_CPU_MEMORIA);
 }
+
+
 void *cliente_conexion_KERNEL(char * arg_kernel[]){
 	t_paquete* send_handshake_kernel;
 	int conexion_CPU_MEMORIA;
@@ -172,24 +187,42 @@ void *cliente_conexion_KERNEL(char * arg_kernel[]){
 	liberar_conexion(conexion_CPU_MEMORIA);
 }
 
-int interpretarArchivo(){
-
+char **interpretarArchivo() {
     FILE *entrada = fopen("entrada.txt", "r");
-    char linea[100]; 
-    char *token;
-    char *instrucciones[100]; // Lista secundaria para almacenar las instrucciones
+    if (entrada == NULL) {
+        perror("Error al abrir el archivo");
+        return NULL;
+    }
 
+    char linea[100];
+    char *token;
+    char **instrucciones = malloc(100 * sizeof(char *));
+    if (instrucciones == NULL) {
+        perror("Error de asignación de memoria");
+        fclose(entrada);
+        return NULL;
+    }
+
+    int indice = 0;
     while (fgets(linea, sizeof(linea), entrada) != NULL) {
-        const char* delimitador = "\n";
+        const char *delimitador = "\n";
         token = strtok(linea, delimitador);
-        int indice = 0; // indice para la lista secundaria
-        while (token != NULL) {
-			log_info(logger, token);
-            instrucciones[indice++] = token;
-            token = strtok(NULL, delimitador);
+        if (token != NULL) {
+            instrucciones[indice] = strdup(token); // Almacenar cada línea
+            indice++;
         }
     }
-    fclose(entrada); 
+    instrucciones[indice] = NULL; 
+    fclose(entrada);
+    return instrucciones;
+}
 
-    return 0;
+void liberarInstrucciones(char **instrucciones) {
+    if (instrucciones == NULL)
+        return;
+
+    for (int i = 0; instrucciones[i] != NULL; i++) {
+        free(instrucciones[i]); // Liberar cada línea del array
+    }
+    free(instrucciones); // Liberar el array
 }
