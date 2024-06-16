@@ -12,5 +12,6 @@ int Saludar(void);
 void *cliente_conexion_IO(char **);
 void *cliente_conexion_CPU(char **);
 void *cliente_conexion_KERNEL(char **);
+char **interpretarArchivo();
 
 #endif /* MEMORIA_MAIN_H_ */
