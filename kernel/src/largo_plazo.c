@@ -6,34 +6,29 @@ void largo_plazo()
     while (1) {
         //sem_wait(&sem_largo_plazo);
         //sem_wait(&sem_multiprogramacion);
+        if(list_size(sch_cola_ready) < 3){
 
-        pthread_mutex_lock(&m_cola_new);
-        pcb_p = list_remove(sch_cola_ready, 0);
-        pthread_mutex_unlock(&m_cola_new);
+            pthread_mutex_lock(&m_cola_new);
+            pcb_p = list_remove(sch_cola_new, 0);
+            pthread_mutex_unlock(&m_cola_new);
 
-        t_paquete *paquete_pcb = crear_paquete (PCB_CPU);
-        agregar_a_paquete(paquete_pcb, &(pcb_p->pid), sizeof(int));
-        agregar_a_paquete(paquete, &(pcb_p->quantum), sizeof(int));
-        enviar_paquete(paquete_pcb, cliente); 
-        eliminar_paquete(paquete_pcb);
+            t_paquete *paquete_pcb = crear_paquete (PCB_CPU);
+            agregar_a_paquete(paquete_pcb, &(pcb_p->pid), sizeof(int));
+            agregar_a_paquete(paquete_pcb, &(pcb_p->quantum), sizeof(int));
+            enviar_paquete(paquete_pcb, cliente_memoria); 
+            eliminar_paquete(paquete_pcb);
 
-        recibir_operacion(cliente);
-        t_list* lista = recibir_paquete(cliente);
-        int* tabla = list_remove(lista, 0);
-        pcb_p->tabla_paginas = *tabla;
+            cambiar_estado(pcb_p, READY);
 
-        list_destroy(lista);
+            pthread_mutex_lock(&m_cola_ready);
+            list_add(sch_cola_ready, pcb_p);
+            pthread_mutex_unlock(&m_cola_ready);
 
-        cambiar_estado(pcb_p, READY);
+            log_info(logger, "Proceso con id %d: New -> Ready", pcb_p->pid);
 
-        pthread_mutex_lock(&m_cola_ready);
-        list_add(sch_cola_ready, pcb_p);
-        pthread_mutex_unlock(&m_cola_ready);
-
-        log_info(logger, "Proceso con id %d: New -> Ready", pcb_p->pid);
-
-        //sem_post(&sem_procesos_en_ready);
-        //sem_post(&sem_corto_plazo);
+            //sem_post(&sem_procesos_en_ready);
+            //sem_post(&sem_corto_plazo);
+        }
     }
 }
 
@@ -42,13 +37,13 @@ void eliminar_proceso(pcb* pcb_p) {
     if (pcb_p->estado == EXEC) {
         enviar_interrupcion(pcb_p->pid);
         // Esperar a que retorne el contexto de ejecución
-        recibir_contexto(pcb_p->pid);
+        recibir_contexto();
     }
 
     // Solicitar a la memoria liberar los recursos asociados al proceso
-    t_paquete* paquete = crear_paquete_con_codigo_especial(FIN_PRO);
+    t_paquete* paquete = crear_paquete(FIN_PRO);
     agregar_a_paquete(paquete, &(pcb_p->pid), sizeof(int));
-    enviar_paquete(paquete, cliente);
+    enviar_paquete(paquete, cliente_memoria);
     eliminar_paquete(paquete);
 
     // Actualizar el grado de multiprogramación
@@ -61,30 +56,31 @@ void eliminar_proceso(pcb* pcb_p) {
 }
 
 void enviar_interrupcion(int pid) {
-    t_paquete* paquete = crear_paquete_con_codigo_especial(INTERRUPCION);
-    agregar_a_paquete(paquete, &pid, sizeof(int));
+    t_paquete* paquete = crear_paquete(INTERRUPCION);
+    agregar_a_paquete(paquete,&pid, sizeof(int));
     enviar_paquete(paquete, socket_cliente_cpu);
     eliminar_paquete(paquete);
 
     log_info(logger, "Interrupción enviada al proceso con id %d", pid);
 }
 
-void recibir_contexto(int pid) {
+void recibir_contexto() {
     recibir_operacion(socket_cliente_cpu);
     t_list* lista = recibir_paquete(socket_cliente_cpu);
     RegistroCPU* registros = list_remove(lista, 0); // contiene los registros de la CPU del proceso
-    int* contador_programa = list_remove(lista, 1); // contiene el contador de programa
+    int contador_programa = list_remove(lista, 1); // contiene el contador de programa
 
-    pcb* pcb_p = buscar_proceso_por_id(pid);
-    if (pcb_p != NULL) {
-        *(pcb_p->registros) = *registros;
-        pcb_p->pc = *contador_programa;
-    }
+    pthread_mutex_lock(&m_cola_exec);
+    pcb* pcb_p = list_remove(sch_cola_exec, 0); //saco el pcb de kernel
+    pcb_p->registros = registros;
+    pcb_p->pc = contador_programa;
+    list_add(sch_cola_exec,pcb_p);
+    pthread_mutex_unlock(&m_cola_exec);
+    sem_post(&sem_p_ready);
 
-    free(registros);
-    free(contador_programa);
 
     list_destroy(lista);
 
-    log_info(logger, "Contexto del proceso con id %d recibido", pid);
+    log_info(logger, "Contexto del proceso con id %d recibido", pcb_p->pid);
+
 }

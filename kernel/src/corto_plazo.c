@@ -13,7 +13,7 @@ void *corto_plazo(algoritmo_planificacion arg){
 
         pthread_mutex_lock(&m_cola_ready);
         pcb = list_remove(sch_cola_ready, 0);
-        pthread_mutex_lock(&m_cola_ready);
+        pthread_mutex_unlock(&m_cola_ready);
 
         //enviar paquete de PCB al CPU
         t_paquete *paquete_pcb = crear_paquete (PCB_CPU);

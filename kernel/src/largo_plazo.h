@@ -7,8 +7,8 @@
 #include <pthread.h>
 
 void largo_plazo();
-void eliminar_proceso(pcb* pcb_p)
+void eliminar_proceso(pcb* pcb_p);
 
-void recibir_contexto(int pid);
+void recibir_contexto();
 void enviar_interrupcion(int pid);
 #endif /* LARGO_PLAZO_H_ */

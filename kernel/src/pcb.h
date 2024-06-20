@@ -36,15 +36,12 @@ typedef struct{
     t_estado estado; // t_estado
     t_list* instrucciones;
     RegistroCPU* registros;
-    
-
 }pcb;
 
 
 pcb* crear_pcb(int pid, int quantum, RegistroCPU registros, t_list* instrucciones);
 pcb* armar_pcb(int pc, int pid, int quantum, RegistroCPU registros, t_list* instrucciones,t_estado estado);
 
-pcb* buscar_proceso_por_id(int pid);
 void eliminar_PCB(pcb* pcb_p);
 void cambiar_estado(pcb* pcb_p, t_estado estado);
 void element_destroyer(void* elemento);

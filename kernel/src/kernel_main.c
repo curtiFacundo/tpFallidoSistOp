@@ -4,7 +4,7 @@
 #include "kernel_main.h"
 
 int socket_cliente_cpu;
-int cliente; // cliente memoria, tendria que cambiar el nombre a un monton de variables
+int cliente_memoria; // cliente memoria, tendria que cambiar el nombre a un monton de variables
 
 int main(int argc, char* argv[]) 
 {    
@@ -95,7 +95,7 @@ void *conexion_memoria(char* puerto)
 	
 	int server = iniciar_servidor(puerto);
 	log_info(logger, "Servidor listo para recibir al cliente MEMORIA");
-	cliente = esperar_cliente(server);  // declaraba cliente aca "int cliente" lo saque para que sea general arriba de todo
+	cliente_memoria = esperar_cliente(server);  // declaraba cliente aca "int cliente" lo saque para que sea general arriba de todo
 
 	//HANDSHAKE
 	handshake_send = crear_paquete(HANDSHAKE);
@@ -104,14 +104,14 @@ void *conexion_memoria(char* puerto)
 
 
 		while(true){
-			int cod_op = recibir_operacion(cliente);
+			int cod_op = recibir_operacion(cliente_memoria);
 			switch (cod_op)
 			{
 				case HANDSHAKE:
-					handshake_recv = recibir_paquete(cliente);
+					handshake_recv = recibir_paquete(cliente_memoria);
 					log_info(logger, "me llego:\n");
 					list_iterate(handshake_recv, (void*) iterator);
-					enviar_paquete(handshake_send, cliente);
+					enviar_paquete(handshake_send, cliente_memoria);
 					break;
 				case -1:
 					log_error(logger, "el cliente se desconecto. Terminando servidor");
@@ -124,7 +124,7 @@ void *conexion_memoria(char* puerto)
 		}
 		
 	close(server);
-	close(cliente);
+	close(cliente_memoria);
 }
 
 void *cliente_conexion_IO(char * arg_io[]){

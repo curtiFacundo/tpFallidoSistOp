@@ -28,11 +28,11 @@ Server -> Cliente:
 
 
 //colas planificador
-extern t_list *sch_cola_ready,*sch_cola_new,*sch_cola_new_plus;
+extern t_list *sch_cola_ready,*sch_cola_new,*sch_cola_new_plus,*sch_cola_block,*sch_cola_exec;
 
 //semaforos
 extern sem_t sem_p_ready;
-extern pthread_mutex_t m_cola_new, m_cola_ready, m_cola_new_plus;
+extern pthread_mutex_t m_cola_new, m_cola_ready, m_cola_new_plus,m_cola_exec;
 
 typedef enum
 {

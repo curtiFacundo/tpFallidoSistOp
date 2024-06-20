@@ -12,6 +12,7 @@ pcb* crear_pcb(int pid, int quantum, RegistroCPU registros, t_list* instruccione
     pcb_p->quantum = 0;
     pcb_p->estado = NEW;
     pcb_p->registros = malloc(sizeof(RegistroCPU));
+    pcb_p->instrucciones = malloc(sizeof(t_list));
     return pcb_p;
 }
 pcb* armar_pcb(int pid, int pc, int quantum, RegistroCPU registros, t_list* instrucciones, t_estado estado)
@@ -47,20 +48,3 @@ void cambiar_estado(pcb* pcb_p, t_estado estado)
 }
 //Buscar procesos
 
-pcb* buscar_proceso_por_id(int pid) {
-
-    pthread_mutex_lock(&mutex_global_process_list);
-    pcb* pcb_p = (pcb*) list_find(global_process_list, Comparo_proceso);
-    pthread_mutex_unlock(&mutex_global_process_list);
-    
-    return pcb_p;
-}
-
-int Comparo_proceso(void* elemento, void* pid) {
-    pcb* pcb_p = (pcb*) elemento;
-    if (ocb_p->pid == *(int*)pid)
-    {
-        return 1;
-    }
-    return 0;
-}

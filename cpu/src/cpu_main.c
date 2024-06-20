@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "cpu_main.h"
-
+pcb* pcb_p;
 int main(void) {
     
 	/*
@@ -90,6 +90,7 @@ void *conexion_memoria(char* puerto)
 {
 	t_paquete *handshake_send;
 	t_paquete *handshake_recv;
+	t_paquete *handshake_interrupcion;
 	char * handshake_texto = "handshake";
 	
 	int server = iniciar_servidor(puerto);
@@ -112,6 +113,14 @@ void *conexion_memoria(char* puerto)
 					list_iterate(handshake_recv, (void*) iterator);
 					enviar_paquete(handshake_send, cliente);
 					break;
+				case INTERRUPCION:
+				    recibir_paquete(cliente);
+					handshake_interrupcion = crear_paquete(INTERRUPCION);
+					agregar_a_paquete(handshake_interrupcion, pcb_p->RegistroCPU, sizeof(RegistroCPU));
+					agregar_a_paquete(handshake_interrupcion, pcb_p->pc, sizeof(int));
+					agregar_a_paquete(handshake_interrupcion, pcb_p->pid, sizeof(int));
+
+
 				case -1:
 					log_error(logger, "el cliente se desconecto. Terminando servidor");
 					return EXIT_FAILURE;
@@ -119,7 +128,7 @@ void *conexion_memoria(char* puerto)
 				default:
 					log_warning(logger,"Operacion desconocida. No quieras meter la pata");
 					break;
-			}
+			}	
 		}
 		
 	close(server);
