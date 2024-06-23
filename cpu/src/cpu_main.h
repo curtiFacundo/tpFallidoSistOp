@@ -32,15 +32,20 @@ typedef enum
     INVALID_OPERATION 
 }t_operaciones;
 
-void *cliente_conexion_KERNEL(char **);
-void *conexion_memoria(char*);
-void levantar_conexiones();
-/*
-void Fetch(pcb* pcb, t_operaciones* operacion);
-void decode(t_operaciones* operacion);
-void Execute(pcb* pcb, t_operaciones *operacion, RegistroCPU *registros);
-void CheckInterrupt();
-*/
+typedef struct{
+    RegistroCPU parametros[2];
+    char ID_instruccion;
+}t_instruccion;
+
+// Declaraciones de funciones
+
+void *cliente_conexion_KERNEL(char *arg_kernel[]);
+void *conexion_memoria(char *puerto);
+void separarInstrucciones(t_paquete *handshake_recv);
+void Fetch(pcb* pcb);
+void decode();
+void Execute(pcb* pcb, RegistroCPU *registros);
+
 
 
 #endif /* CPU_MAIN_H_ */

@@ -136,7 +136,7 @@ void *cliente_conexion_IO(char * arg_io[]){
 	}while(conexion_IO_KERNEL == -1);
 	
 	
-	send_handshake_io = crear_paquete(HANDSHAKE);
+	send_handshake_io = crear_paquete(INSTRUCCIONES);
 	agregar_a_paquete (send_handshake_io,valor_IO, strlen(valor_IO)+1); 
 
 	while(flag){
@@ -148,7 +148,9 @@ void *cliente_conexion_IO(char * arg_io[]){
 		case HANDSHAKE:
 			log_info(logger, "recibi handshake de IO");
 			break;
-		
+		case INSTRUCCIONES:
+			log_info(logger, "Recibi el archivo de instruccciones de IO");
+			break;
 		case TERMINATE:
 			flag = 0;
 			break;

@@ -102,35 +102,11 @@ void *cliente_conexion_CPU(char *arg_cpu[]) {
 
     } while (conexion_CPU_MEMORIA == -1);
 
-    send_handshake_cpu = crear_paquete(INSTRUCCIONES);
-    agregar_a_paquete(send_handshake_cpu, valor_CPU, strlen(valor_CPU) + 1);
-	char **instrucciones = interpretarArchivo();
-    if (instrucciones == NULL) {
-        log_error(logger, "Error al interpretar el archivo");
-        eliminar_paquete(send_handshake_cpu);
-        liberar_conexion(conexion_CPU_MEMORIA);
-        return NULL;
-    }
-
-    // Enviar las instrucciones línea por línea
-    for (int i = 0; instrucciones[i] != NULL; i++) {
-        agregar_a_paquete(send_handshake_cpu, instrucciones[i], strlen(instrucciones[i]) + 1);
-        enviar_paquete(send_handshake_cpu, conexion_CPU_MEMORIA);
-        sleep(1);
-    }
-
-    // Liberar la memoria asignada a las instrucciones
-    liberarInstrucciones(instrucciones);
-
     while (flag) {
         op = recibir_operacion(conexion_CPU_MEMORIA);
         switch (op) {
             case HANDSHAKE:
                 log_info(logger, "recibi handshake de CPU");
-                break;
-            case INSTRUCCIONES:
-                log_info(logger, "envio instrucciones a CPU");
-                // Aquí podrías procesar algo después de enviar todas las instrucciones
                 break;
             case TERMINATE:
                 flag = 0;
@@ -187,42 +163,4 @@ void *cliente_conexion_KERNEL(char * arg_kernel[]){
 	liberar_conexion(conexion_CPU_MEMORIA);
 }
 
-char **interpretarArchivo() {
-    FILE *entrada = fopen("entrada.txt", "r");
-    if (entrada == NULL) {
-        perror("Error al abrir el archivo");
-        return NULL;
-    }
 
-    char linea[100];
-    char *token;
-    char **instrucciones = malloc(100 * sizeof(char *));
-    if (instrucciones == NULL) {
-        perror("Error de asignación de memoria");
-        fclose(entrada);
-        return NULL;
-    }
-
-    int indice = 0;
-    while (fgets(linea, sizeof(linea), entrada) != NULL) {
-        const char *delimitador = "\n";
-        token = strtok(linea, delimitador);
-        if (token != NULL) {
-            instrucciones[indice] = strdup(token); // Almacenar cada línea
-            indice++;
-        }
-    }
-    instrucciones[indice] = NULL; 
-    fclose(entrada);
-    return instrucciones;
-}
-
-void liberarInstrucciones(char **instrucciones) {
-    if (instrucciones == NULL)
-        return;
-
-    for (int i = 0; instrucciones[i] != NULL; i++) {
-        free(instrucciones[i]); // Liberar cada línea del array
-    }
-    free(instrucciones); // Liberar el array
-}

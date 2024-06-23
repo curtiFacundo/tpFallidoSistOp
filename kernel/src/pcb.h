@@ -1,7 +1,7 @@
 #ifndef PCB_H_
 #define PCB_H_
 
-#include  <stdint.h> // asegura que usamos tipos de enteros estándar 
+#include  <stdint.h> 
 #include <utils.h>
 typedef enum  
 {
@@ -13,7 +13,7 @@ typedef enum
 }t_estado;
 
 typedef struct{
-    uint32_t PC;//PROGRAM COUNTER
+    uint32_t PC;
     uint8_t AX;
     uint8_t BX;
     uint8_t CX;
@@ -26,22 +26,27 @@ typedef struct{
     uint32_t edi;
     uint32_t ebp;
     uint32_t esp;
-}RegistroCPU; // dice registros generales, supongo que se refiere a hacer esto :calavera:
-typedef struct{
-    int pid; // id del proceso
-    int pc; // id program counter 
-    int quantum; 
-    t_estado estado; // t_estado
-    t_list* instrucciones;
+}RegistroCPU;
+typedef struct {
+    uint32_t parametros[2];
+    char* ID_instruccion;
+    int parametros_validos;
+} t_instruccion;
+
+typedef struct {
+    int pid;
+    int pc;
+    int quantum;
+    t_estado estado;
     RegistroCPU* registros;
-}pcb;
+    t_list* instrucciones;
+} pcb;
 
-
-pcb* crear_pcb(int pid, int quantum, RegistroCPU registros, t_list* instrucciones);
-pcb* armar_pcb(int pc, int pid, int quantum, RegistroCPU registros, t_list* instrucciones,t_estado estado);
+pcb* crear_pcb(int pid, int quantum, RegistroCPU registros);
+pcb* armar_pcb(int pid, int pc, int quantum, RegistroCPU registros, FILE* archivo, t_estado estado);
 void eliminar_PCB(pcb* pcb_p);
 void cambiar_estado(pcb* pcb_p, t_estado estado);
-void element_destroyer(void* elemento);
+t_list* interpretarArchivo(FILE* archivo);
+void liberarInstrucciones(t_list* instrucciones);
 
-
-#endif /* CORTO_PLAZO_H_ */
+#endif

@@ -43,7 +43,7 @@ void *conexion_kernel(char* puerto)
 		int cliente = esperar_cliente(server);
 
 	//HANDSHAKE
-	handshake_send = crear_paquete(HANDSHAKE);
+	handshake_send = crear_paquete(INSTRUCCIONES);
 	agregar_a_paquete (handshake_send, handshake_texto , strlen(handshake_texto)+1);
 	//HANDSHAKE_end
 
@@ -53,6 +53,12 @@ void *conexion_kernel(char* puerto)
 			switch (cod_op)
 			{
 				case HANDSHAKE:
+					handshake_recv = recibir_paquete(cliente);
+					log_info(logger, "me llego:\n");
+					list_iterate(handshake_recv, (void*) iterator);
+					enviar_paquete(handshake_send, cliente);
+					break;
+				case INSTRUCCIONES:
 					handshake_recv = recibir_paquete(cliente);
 					log_info(logger, "me llego:\n");
 					list_iterate(handshake_recv, (void*) iterator);
