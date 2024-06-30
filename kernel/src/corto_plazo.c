@@ -1,9 +1,9 @@
 #include "corto_plazo.h"
 
-void *corto_plazo(algoritmo_planificacion arg){
+void *corto_plazo(void * arg){
     pcb *pcb;
-
-    switch(arg){
+    argumentos_thread_scheduler * algoritmo = arg;
+    switch(algoritmo->algoritmo){
         
         case FIFO:
         while(true){

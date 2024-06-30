@@ -11,6 +11,10 @@ typedef enum
     VRR
 }algoritmo_planificacion;
 
-void *corto_plazo(algoritmo_planificacion arg);
+struct arg_struct_sch {
+    algoritmo_planificacion algoritmo;
+}typedef argumentos_thread_scheduler;
+
+void *corto_plazo(void*);
 
 #endif /* CORTO_PLAZO_H_ */

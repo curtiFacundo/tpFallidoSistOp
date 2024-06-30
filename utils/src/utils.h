@@ -39,6 +39,7 @@ struct arg_struct {
     char * ip;
 }typedef argumentos_thread;
 
+
 typedef enum
 {
     HANDSHAKE,

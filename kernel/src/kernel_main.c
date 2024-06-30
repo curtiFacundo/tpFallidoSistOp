@@ -14,6 +14,8 @@ int main(int argc, char* argv[])
 	pthread_t tid_io;
 	pthread_t tid_scheduler;
 
+	argumentos_thread_scheduler arg_sch;
+
 	void *ret_value;
 	argumentos_thread arg_io;
 	argumentos_thread arg_memoria;
@@ -24,7 +26,8 @@ int main(int argc, char* argv[])
     config_global = config_create("../utils/config/config_global.config");
    	
 	//planificador
-	pthread_create(&tid_scheduler,NULL,corto_plazo,FIFO);
+	arg_sch.algoritmo = FIFO;
+	pthread_create(&tid_scheduler,NULL,corto_plazo,(void*)&arg_sch);
 	pthread_detach(tid_scheduler);
 
 
