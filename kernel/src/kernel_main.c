@@ -122,9 +122,6 @@ void *conexion_memoria(void* puerto)
 void *cliente_conexion_IO(void * arg_io){
 
 	argumentos_thread * args = arg_io;
-
-	log_info(logger, args->ip);
-	log_info(logger, args->puerto);
 	t_paquete* send_handshake_io;
 	int conexion_IO_KERNEL;
 	protocolo_socket op;
