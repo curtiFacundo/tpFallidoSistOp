@@ -13,7 +13,7 @@ int main(void) {
 	
 	pthread_t tid_memoria;
 	pthread_t tid_kernel;
-	char *ret_value;
+	void *ret_value;
 	argumentos_thread arg_kernel;
 	argumentos_thread arg_memoria;
 	
@@ -104,7 +104,7 @@ void *conexion_memoria(void * arg_memoria)
 					break;
 				case -1:
 					log_error(logger, "el cliente se desconecto. Terminando servidor");
-					return EXIT_FAILURE;
+					return (void *)EXIT_FAILURE;
 					break;
 				default:
 					log_warning(logger,"Operacion desconocida. No quieras meter la pata");
