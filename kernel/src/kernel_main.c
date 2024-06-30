@@ -11,10 +11,10 @@ int main(int argc, char* argv[])
 	pthread_t tid_memoria;
 	pthread_t tid_cpu;
 	pthread_t tid_io;
-	char *ret_value;
+	void *ret_value;
 	char *puerto_memoria;
 	char *puerto_cpu;
-	char *arg_io[2]; // [PUERTO | IP]
+	argumentos_thread arg_io;
 
 
 	logger = log_create("kernel.log", "Kernel", 1, LOG_LEVEL_DEBUG);
@@ -22,13 +22,13 @@ int main(int argc, char* argv[])
    	
 	puerto_memoria = config_get_string_value(config_global, "PUERTO_KERNEL->MEMORIA");
 	puerto_cpu = config_get_string_value(config_global, "PUERTO_KERNEL->CPU");
-	arg_io[0] = config_get_string_value(config_global, "PUERTO_IO->KERNEL");
-	arg_io[1] = config_get_string_value(config_global, "IP_IO");
+	arg_io.puerto = config_get_string_value(config_global, "PUERTO_IO->KERNEL");
+	arg_io.ip = config_get_string_value(config_global, "IP_IO");
 
 	//conexiones
 	pthread_create(&tid_memoria, NULL, conexion_memoria, puerto_memoria);
 	pthread_create(&tid_cpu, NULL, conexion_cpu, puerto_cpu);
-	pthread_create(&tid_io, NULL, cliente_conexion_IO, arg_io);
+	pthread_create(&tid_io, NULL, cliente_conexion_IO, (void *)&arg_io);
 	//conexiones
 
 	//espero fin conexiones
@@ -40,10 +40,10 @@ int main(int argc, char* argv[])
 	return 0;
 }
 
-void *conexion_cpu(char* puerto)
+void *conexion_cpu(void* puerto)
 {
 	t_paquete *handshake_send;
-	t_paquete *handshake_recv;
+	t_list *handshake_recv;
 	char * handshake_texto = "handshake";
 	
 	int server = iniciar_servidor(puerto);
@@ -68,7 +68,7 @@ void *conexion_cpu(char* puerto)
 					break;
 				case -1:
 					log_error(logger, "el cliente se desconecto. Terminando servidor");
-					return EXIT_FAILURE;
+					return (void *)EXIT_FAILURE;
 					break;
 				default:
 					log_warning(logger,"Operacion desconocida. No quieras meter la pata");
@@ -79,10 +79,10 @@ void *conexion_cpu(char* puerto)
 	close(server);
 	close(cliente);
 }
-void *conexion_memoria(char* puerto) 
+void *conexion_memoria(void* puerto) 
 {
 	t_paquete *handshake_send;
-	t_paquete *handshake_recv;
+	t_list *handshake_recv;
 	char * handshake_texto = "handshake";
 	
 	int server = iniciar_servidor(puerto);
@@ -107,7 +107,7 @@ void *conexion_memoria(char* puerto)
 					break;
 				case -1:
 					log_error(logger, "el cliente se desconecto. Terminando servidor");
-					return EXIT_FAILURE;
+					return (void *)EXIT_FAILURE;
 					break;
 				default:
 					log_warning(logger,"Operacion desconocida. No quieras meter la pata");
@@ -119,8 +119,12 @@ void *conexion_memoria(char* puerto)
 	close(cliente);
 }
 
-void *cliente_conexion_IO(char * arg_io[]){
+void *cliente_conexion_IO(void * arg_io){
 
+	argumentos_thread * args = arg_io;
+
+	log_info(logger, args->ip);
+	log_info(logger, args->puerto);
 	t_paquete* send_handshake_io;
 	int conexion_IO_KERNEL;
 	protocolo_socket op;
@@ -130,7 +134,7 @@ void *cliente_conexion_IO(char * arg_io[]){
 
 	do
 	{
-		conexion_IO_KERNEL = crear_conexion(arg_io[1], arg_io[0]);
+		conexion_IO_KERNEL = crear_conexion(args->ip, args->puerto);
 		sleep(1);
 
 	}while(conexion_IO_KERNEL == -1);
