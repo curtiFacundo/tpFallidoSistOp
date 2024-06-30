@@ -57,12 +57,12 @@ void *cliente_conexion_IO(void * arg_io){
 	char *valor_IO;
 	valor_IO = config_get_string_value(config_global, "CLAVE_MEMORIA");
 
-	do
-	{
+	while(true){
 		conexion_IO_MEMORIA = crear_conexion(args->ip, args->puerto);
-		sleep(1);
-
-	}while(conexion_IO_MEMORIA == -1);
+		if(conexion_IO_MEMORIA == -1){
+			sleep (1);
+		}else break;
+	}
 	
 	
 	send_handshake_io = crear_paquete(HANDSHAKE);
@@ -100,12 +100,13 @@ void *cliente_conexion_CPU(void * arg_cpu){
 	char *valor_CPU;
 	valor_CPU = config_get_string_value(config_global, "CLAVE_MEMORIA");
 
-	do
-	{
+		while(true){
 		conexion_CPU_MEMORIA = crear_conexion(args->ip, args->puerto);
-		sleep(1);
-
-	}while(conexion_CPU_MEMORIA == -1);
+		if(conexion_CPU_MEMORIA == -1){
+			sleep (1);
+		}else break;
+	}
+	
 	
 	
 	send_handshake_cpu = crear_paquete(HANDSHAKE);
@@ -137,27 +138,27 @@ void *cliente_conexion_KERNEL(void * arg_kernel){
 	
 	argumentos_thread * args = arg_kernel;
 	t_paquete* send_handshake_kernel;
-	int conexion_CPU_MEMORIA;
+	int conexion_KERNEL_MEMORIA;
 	protocolo_socket op;
 	int flag=1;
 	char *valor_KERNEL;
 	valor_KERNEL = config_get_string_value(config_global, "CLAVE_MEMORIA");
 
-	do
-	{
-		conexion_CPU_MEMORIA = crear_conexion(args->ip, args->puerto);
-		sleep(1);
-
-	}while(conexion_CPU_MEMORIA == -1);
+	while(true){
+		conexion_KERNEL_MEMORIA = crear_conexion(args->ip, args->puerto);
+		if(conexion_KERNEL_MEMORIA == -1){
+			sleep (1);
+		}else break;
+	}
 	
 	
 	send_handshake_kernel = crear_paquete(HANDSHAKE);
 	agregar_a_paquete (send_handshake_kernel,valor_KERNEL, strlen(valor_KERNEL)+1); 
 
 	while(flag){
-		enviar_paquete(send_handshake_kernel, conexion_CPU_MEMORIA);
+		enviar_paquete(send_handshake_kernel, conexion_KERNEL_MEMORIA);
 		sleep(1);
-		op = recibir_operacion(conexion_CPU_MEMORIA);
+		op = recibir_operacion(conexion_KERNEL_MEMORIA);
 		switch (op)
 		{
 		case HANDSHAKE:
@@ -174,5 +175,5 @@ void *cliente_conexion_KERNEL(void * arg_kernel){
 	}
 
 	eliminar_paquete(send_handshake_kernel);
-	liberar_conexion(conexion_CPU_MEMORIA);
+	liberar_conexion(conexion_KERNEL_MEMORIA);
 }

@@ -49,7 +49,13 @@ void *cliente_conexion_KERNEL(void * arg_kernel){
 	char* valor_CPU;
 	
 	valor_CPU = config_get_string_value(config_global, "CLAVE_CPU");
-	server = crear_conexion(args->ip, args->puerto);
+	while(true){
+		server = crear_conexion(args->ip, args->puerto);
+		if(server == -1){
+			sleep (1);
+		}else break;
+	}
+	
 	send_handshake = crear_paquete(HANDSHAKE);
 	agregar_a_paquete (send_handshake, valor_CPU , strlen(valor_CPU)+1); 
 
