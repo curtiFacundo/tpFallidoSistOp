@@ -14,10 +14,10 @@ int main(int argc, char* argv[])
 	pthread_t tid_io;
 	pthread_t tid_scheduler;
 
-	char *ret_value;
-	char *puerto_memoria;
-	char *puerto_cpu;
-	char *arg_io[2]; // [PUERTO | IP]
+	void *ret_value;
+	argumentos_thread arg_io;
+	argumentos_thread arg_memoria;
+	argumentos_thread arg_cpu;
 
 
 	logger = log_create("kernel.log", "Kernel", 1, LOG_LEVEL_DEBUG);
@@ -29,14 +29,15 @@ int main(int argc, char* argv[])
 
 
 	//conexiones
-	puerto_memoria = config_get_string_value(config_global, "PUERTO_KERNEL->MEMORIA");
-	puerto_cpu = config_get_string_value(config_global, "PUERTO_KERNEL->CPU");
-	arg_io[0] = config_get_string_value(config_global, "PUERTO_IO->KERNEL");
-	arg_io[1] = config_get_string_value(config_global, "IP_IO");
+	arg_memoria.puerto = config_get_string_value(config_global, "PUERTO_KERNEL->MEMORIA");
+	arg_cpu.puerto = config_get_string_value(config_global, "PUERTO_KERNEL->CPU");
+	arg_io.puerto = config_get_string_value(config_global, "PUERTO_IO->KERNEL");
+	arg_io.ip = config_get_string_value(config_global, "IP_IO");
 
-	pthread_create(&tid_memoria, NULL, conexion_memoria, puerto_memoria);
-	pthread_create(&tid_cpu, NULL, conexion_cpu, puerto_cpu);
-	pthread_create(&tid_io, NULL, cliente_conexion_IO, arg_io);
+	//conexiones
+	pthread_create(&tid_memoria, NULL, conexion_memoria, (void *)&arg_memoria);
+	pthread_create(&tid_cpu, NULL, conexion_cpu, (void *)&arg_cpu);
+	pthread_create(&tid_io, NULL, cliente_conexion_IO, (void *)&arg_io);
 	//conexiones
 
 	//espero fin conexiones
@@ -48,13 +49,14 @@ int main(int argc, char* argv[])
 	return 0;
 }
 
-void *conexion_cpu(char* puerto)
+void *conexion_cpu(void* arg_cpu)
 {
+	argumentos_thread * args = arg_cpu; 
 	t_paquete *handshake_send;
-	t_paquete *handshake_recv;
+	t_list *handshake_recv;
 	char * handshake_texto = "handshake";
 	
-	int server = iniciar_servidor(puerto);
+	int server = iniciar_servidor(args->puerto);
 	log_info(logger, "Servidor listo para recibir al cliente CPU");
 	
 	socket_cliente_cpu = esperar_cliente(server);
@@ -76,7 +78,7 @@ void *conexion_cpu(char* puerto)
 					break;
 				case -1:
 					log_error(logger, "el cliente se desconecto. Terminando servidor");
-					return EXIT_FAILURE;
+					return (void *)EXIT_FAILURE;
 					break;
 				default:
 					log_warning(logger,"Operacion desconocida. No quieras meter la pata");
@@ -87,13 +89,14 @@ void *conexion_cpu(char* puerto)
 	close(server);
 	close(socket_cliente_cpu);
 }
-void *conexion_memoria(void* puerto) 
+void *conexion_memoria(void* arg_memoria) 
 {
+	argumentos_thread * args = arg_memoria;
 	t_paquete *handshake_send;
-	t_paquete *handshake_recv;
+	t_list *handshake_recv;
 	char * handshake_texto = "handshake";
 	
-	int server = iniciar_servidor(puerto);
+	int server = iniciar_servidor(args->puerto);
 	log_info(logger, "Servidor listo para recibir al cliente MEMORIA");
 	cliente_memoria = esperar_cliente(server);  // declaraba cliente aca "int cliente" lo saque para que sea general arriba de todo
 
@@ -115,7 +118,7 @@ void *conexion_memoria(void* puerto)
 					break;
 				case -1:
 					log_error(logger, "el cliente se desconecto. Terminando servidor");
-					return EXIT_FAILURE;
+					return (void *)EXIT_FAILURE;
 					break;
 				default:
 					log_warning(logger,"Operacion desconocida. No quieras meter la pata");
@@ -127,8 +130,9 @@ void *conexion_memoria(void* puerto)
 	close(cliente_memoria);
 }
 
-void *cliente_conexion_IO(char * arg_io[]){
+void *cliente_conexion_IO(void * arg_io){
 
+	argumentos_thread * args = arg_io;
 	t_paquete* send_handshake_io;
 	int conexion_IO_KERNEL;
 	protocolo_socket op;
@@ -138,7 +142,7 @@ void *cliente_conexion_IO(char * arg_io[]){
 
 	do
 	{
-		conexion_IO_KERNEL = crear_conexion(arg_io[1], arg_io[0]);
+		conexion_IO_KERNEL = crear_conexion(args->ip, args->puerto);
 		sleep(1);
 
 	}while(conexion_IO_KERNEL == -1);
