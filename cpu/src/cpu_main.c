@@ -79,7 +79,7 @@ void *conexion_memoria(void * arg_memoria)
 {
 	argumentos_thread * args = arg_memoria;
 	t_paquete *handshake_send;
-	t_paquete *handshake_recv;
+	t_list *handshake_recv;
 	char * handshake_texto = "handshake";
 	
 	int server = iniciar_servidor(args->puerto);
