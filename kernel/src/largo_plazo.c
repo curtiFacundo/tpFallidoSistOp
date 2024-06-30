@@ -68,7 +68,7 @@ void recibir_contexto() {
     recibir_operacion(socket_cliente_cpu);
     t_list* lista = recibir_paquete(socket_cliente_cpu);
     RegistroCPU* registros = list_remove(lista, 0); // contiene los registros de la CPU del proceso
-    int contador_programa = list_remove(lista, 1); // contiene el contador de programa
+    int contador_programa = (int)list_remove(lista, 1); // contiene el contador de programa
 
     pthread_mutex_lock(&m_cola_exec);
     pcb* pcb_p = list_remove(sch_cola_exec, 0); //saco el pcb de kernel

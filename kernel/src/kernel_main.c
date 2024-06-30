@@ -87,7 +87,7 @@ void *conexion_cpu(char* puerto)
 	close(server);
 	close(socket_cliente_cpu);
 }
-void *conexion_memoria(char* puerto) 
+void *conexion_memoria(void* puerto) 
 {
 	t_paquete *handshake_send;
 	t_paquete *handshake_recv;
