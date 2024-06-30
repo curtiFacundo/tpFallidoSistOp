@@ -15,27 +15,28 @@ int main(void) {
 	pthread_t tid_kernel;
 	pthread_t tid_cpu;
 	pthread_t tid_io;
-	char *ret_value;
-	char *arg_io[2]; // [PUERTO | IP]
-	char *arg_cpu[2]; // [PUERTO | IP]
-	char *arg_kernel[2]; // [PUERTO | IP]
+	void *ret_value;
+
+	argumentos_thread arg_io;
+	argumentos_thread arg_cpu;
+	argumentos_thread arg_kernel;
 
 	logger = log_create("memoria.log", "memoria", 1, LOG_LEVEL_DEBUG);
 	config_global = config_create("../utils/config/config_global.config");
 
-	arg_io[0] = config_get_string_value(config_global, "PUERTO_IO->MEMORIA");
-	arg_io[1] = config_get_string_value(config_global, "IP_IO");
+	arg_io.puerto = config_get_string_value(config_global, "PUERTO_IO->MEMORIA");
+	arg_io.ip = config_get_string_value(config_global, "IP_IO");
 
-	arg_cpu[0] = config_get_string_value(config_global, "PUERTO_CPU->MEMORIA");
-	arg_cpu[1] = config_get_string_value(config_global, "IP_CPU");
+	arg_cpu.puerto = config_get_string_value(config_global, "PUERTO_CPU->MEMORIA");
+	arg_cpu.ip = config_get_string_value(config_global, "IP_CPU");
 
-	arg_kernel[0] = config_get_string_value(config_global, "PUERTO_KERNEL->MEMORIA");
-	arg_kernel[1] = config_get_string_value(config_global, "IP_KERNEL");
+	arg_kernel.puerto = config_get_string_value(config_global, "PUERTO_KERNEL->MEMORIA");
+	arg_kernel.ip = config_get_string_value(config_global, "IP_KERNEL");
 	
 	//conexiones
-	pthread_create(&tid_kernel, NULL, cliente_conexion_IO, arg_io);
-	pthread_create(&tid_cpu, NULL, cliente_conexion_CPU, arg_cpu);
-	pthread_create(&tid_io, NULL, cliente_conexion_KERNEL, arg_kernel);
+	pthread_create(&tid_kernel, NULL, cliente_conexion_IO,  (void *)&arg_io);
+	pthread_create(&tid_cpu, NULL, cliente_conexion_CPU,  (void *)&arg_cpu);
+	pthread_create(&tid_io, NULL, cliente_conexion_KERNEL, (void *)&arg_kernel);
 	//conexiones
 
 	//espero fin conexiones
@@ -46,8 +47,9 @@ int main(void) {
 
 	return 0;
 }
-void *cliente_conexion_IO(char * arg_io[]){
+void *cliente_conexion_IO(void * arg_io){
 	
+	argumentos_thread * args = arg_io;
 	t_paquete* send_handshake_io;
 	int conexion_IO_MEMORIA;
 	protocolo_socket op;
@@ -57,7 +59,7 @@ void *cliente_conexion_IO(char * arg_io[]){
 
 	do
 	{
-		conexion_IO_MEMORIA = crear_conexion(arg_io[1], arg_io[0]);
+		conexion_IO_MEMORIA = crear_conexion(args->ip, args->puerto);
 		sleep(1);
 
 	}while(conexion_IO_MEMORIA == -1);
@@ -88,8 +90,9 @@ void *cliente_conexion_IO(char * arg_io[]){
 	eliminar_paquete(send_handshake_io);
 	liberar_conexion(conexion_IO_MEMORIA);
 }
-void *cliente_conexion_CPU(char * arg_cpu[]){
+void *cliente_conexion_CPU(void * arg_cpu){
 	
+	argumentos_thread * args = arg_cpu;
 	t_paquete* send_handshake_cpu;
 	int conexion_CPU_MEMORIA;
 	protocolo_socket op;
@@ -99,7 +102,7 @@ void *cliente_conexion_CPU(char * arg_cpu[]){
 
 	do
 	{
-		conexion_CPU_MEMORIA = crear_conexion(arg_cpu[1], arg_cpu[0]);
+		conexion_CPU_MEMORIA = crear_conexion(args->ip, args->puerto);
 		sleep(1);
 
 	}while(conexion_CPU_MEMORIA == -1);
@@ -130,7 +133,9 @@ void *cliente_conexion_CPU(char * arg_cpu[]){
 	eliminar_paquete(send_handshake_cpu);
 	liberar_conexion(conexion_CPU_MEMORIA);
 }
-void *cliente_conexion_KERNEL(char * arg_kernel[]){
+void *cliente_conexion_KERNEL(void * arg_kernel){
+	
+	argumentos_thread * args = arg_kernel;
 	t_paquete* send_handshake_kernel;
 	int conexion_CPU_MEMORIA;
 	protocolo_socket op;
@@ -140,7 +145,7 @@ void *cliente_conexion_KERNEL(char * arg_kernel[]){
 
 	do
 	{
-		conexion_CPU_MEMORIA = crear_conexion(arg_kernel[1], arg_kernel[0]);
+		conexion_CPU_MEMORIA = crear_conexion(args->ip, args->puerto);
 		sleep(1);
 
 	}while(conexion_CPU_MEMORIA == -1);
