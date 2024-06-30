@@ -14,21 +14,21 @@ int main(void) {
 	pthread_t tid_memoria;
 	pthread_t tid_kernel;
 	char *ret_value;
-	char *puerto_memoria;
-	char *arg_kernel[2]; // [PUERTO | IP]
+	argumentos_thread arg_kernel;
+	argumentos_thread arg_memoria;
 	
 
     //int socket_id = iniciar_servidor();
     config_global = config_create("../utils/config/config_global.config");
 
-	puerto_memoria = config_get_string_value(config_global, "PUERTO_CPU->MEMORIA");
-	arg_kernel[0] = config_get_string_value(config_global, "PUERTO_KERNEL->CPU");
-	arg_kernel[1] = config_get_string_value(config_global, "IP_KERNEL");
+	arg_memoria.puerto = config_get_string_value(config_global, "PUERTO_CPU->MEMORIA");
+	arg_kernel.puerto = config_get_string_value(config_global, "PUERTO_KERNEL->CPU");
+	arg_kernel.ip = config_get_string_value(config_global, "IP_KERNEL");
 
 
 	//conexiones
-	pthread_create(&tid_memoria, NULL, conexion_memoria, puerto_memoria);
-	pthread_create(&tid_kernel, NULL, cliente_conexion_KERNEL, arg_kernel);
+	pthread_create(&tid_memoria, NULL, conexion_memoria,  (void *)&arg_memoria);
+	pthread_create(&tid_kernel, NULL, cliente_conexion_KERNEL,  (void *)&arg_kernel);
 	//conexiones
 
 	//espero fin conexiones
