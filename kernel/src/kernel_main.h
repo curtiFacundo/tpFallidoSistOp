@@ -13,9 +13,4 @@ void *conexion_cpu(void*);
 void *conexion_memoria(void*);
 void *cliente_conexion_IO(void *);
 
-struct arg_struct {
-    char * puerto;
-    char * ip;
-}typedef argumentos_thread;
-
 #endif /* KERNEL_MAIN_H_ */

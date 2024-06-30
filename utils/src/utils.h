@@ -26,6 +26,10 @@ Server -> Cliente:
 * I/O -> Memoria
 */
 
+struct arg_struct {
+    char * puerto;
+    char * ip;
+}typedef argumentos_thread;
 typedef enum
 {
     HANDSHAKE,
