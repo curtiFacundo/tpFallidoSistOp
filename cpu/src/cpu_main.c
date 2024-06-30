@@ -39,21 +39,17 @@ int main(void) {
 	// terminar_programa(server_fd_memoria, logger, config_global); //logger: redundante (global) pero esta definido asi en utils.h
     return 0;
 }
-void *cliente_conexion_KERNEL(char * arg_kernel[]){
+void *cliente_conexion_KERNEL(void * arg_kernel){
+	
+	argumentos_thread * args = arg_kernel;
 	t_paquete* send_handshake;
 	int server;
 	protocolo_socket op;
 	int flag=1;
 	char* valor_CPU;
 	
-	log_info(logger, "Conectando a kernel");
-	log_info(logger, "IP:");
-	log_info(logger, arg_kernel[1]);
-	log_info(logger, "Puerto:");
-	log_info(logger, arg_kernel[0]);
-
 	valor_CPU = config_get_string_value(config_global, "CLAVE_CPU");
-	server = crear_conexion(arg_kernel[1], arg_kernel[0]);
+	server = crear_conexion(args->ip, args->puerto);
 	send_handshake = crear_paquete(HANDSHAKE);
 	agregar_a_paquete (send_handshake, valor_CPU , strlen(valor_CPU)+1); 
 
@@ -79,13 +75,14 @@ void *cliente_conexion_KERNEL(char * arg_kernel[]){
 	eliminar_paquete(send_handshake);
 	liberar_conexion(server);
 }
-void *conexion_memoria(char* puerto) 
+void *conexion_memoria(void * arg_memoria) 
 {
+	argumentos_thread * args = arg_memoria;
 	t_paquete *handshake_send;
 	t_paquete *handshake_recv;
 	char * handshake_texto = "handshake";
 	
-	int server = iniciar_servidor(puerto);
+	int server = iniciar_servidor(args->puerto);
 		log_info(logger, "Servidor listo para recibir al cliente MEMORIA");
 		int cliente = esperar_cliente(server);
 

@@ -23,8 +23,8 @@ typedef enum
     IO_STDIN_WRITE,
 }t_operaciones;
 
-void *cliente_conexion_KERNEL(char **);
-void *conexion_memoria(char*);
+void *cliente_conexion_KERNEL(void *);
+void *conexion_memoria(void *);
 void levantar_conexiones();
 
 void Fetch();

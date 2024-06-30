@@ -12,22 +12,22 @@ int main(int argc, char* argv[])
 	pthread_t tid_cpu;
 	pthread_t tid_io;
 	void *ret_value;
-	char *puerto_memoria;
-	char *puerto_cpu;
 	argumentos_thread arg_io;
+	argumentos_thread arg_memoria;
+	argumentos_thread arg_cpu;
 
 
 	logger = log_create("kernel.log", "Kernel", 1, LOG_LEVEL_DEBUG);
     config_global = config_create("../utils/config/config_global.config");
    	
-	puerto_memoria = config_get_string_value(config_global, "PUERTO_KERNEL->MEMORIA");
-	puerto_cpu = config_get_string_value(config_global, "PUERTO_KERNEL->CPU");
+	arg_memoria.puerto = config_get_string_value(config_global, "PUERTO_KERNEL->MEMORIA");
+	arg_cpu.puerto = config_get_string_value(config_global, "PUERTO_KERNEL->CPU");
 	arg_io.puerto = config_get_string_value(config_global, "PUERTO_IO->KERNEL");
 	arg_io.ip = config_get_string_value(config_global, "IP_IO");
 
 	//conexiones
-	pthread_create(&tid_memoria, NULL, conexion_memoria, puerto_memoria);
-	pthread_create(&tid_cpu, NULL, conexion_cpu, puerto_cpu);
+	pthread_create(&tid_memoria, NULL, conexion_memoria, (void *)&arg_memoria);
+	pthread_create(&tid_cpu, NULL, conexion_cpu, (void *)&arg_cpu);
 	pthread_create(&tid_io, NULL, cliente_conexion_IO, (void *)&arg_io);
 	//conexiones
 
@@ -40,13 +40,14 @@ int main(int argc, char* argv[])
 	return 0;
 }
 
-void *conexion_cpu(void* puerto)
+void *conexion_cpu(void* arg_cpu)
 {
+	argumentos_thread * args = arg_cpu; 
 	t_paquete *handshake_send;
 	t_list *handshake_recv;
 	char * handshake_texto = "handshake";
 	
-	int server = iniciar_servidor(puerto);
+	int server = iniciar_servidor(args->puerto);
 		log_info(logger, "Servidor listo para recibir al cliente CPU");
 		int cliente = esperar_cliente(server);
 
@@ -79,13 +80,14 @@ void *conexion_cpu(void* puerto)
 	close(server);
 	close(cliente);
 }
-void *conexion_memoria(void* puerto) 
+void *conexion_memoria(void* arg_memoria) 
 {
+	argumentos_thread * args = arg_memoria;
 	t_paquete *handshake_send;
 	t_list *handshake_recv;
 	char * handshake_texto = "handshake";
 	
-	int server = iniciar_servidor(puerto);
+	int server = iniciar_servidor(args->puerto);
 		log_info(logger, "Servidor listo para recibir al cliente MEMORIA");
 		int cliente = esperar_cliente(server);
 
