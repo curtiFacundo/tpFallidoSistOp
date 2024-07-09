@@ -3,25 +3,26 @@
 #include "entradasalida_main.h"
 
 int main(int argc, char* argv[]) {
-        
+           
 	/*
 	TO DO list:
 	*/
 	pthread_t tid_kernel;
 	pthread_t tid_memoria;
-	char *ret_value;
-	char *puerto_memoria;
-	char *puerto_kernel;
- 
+	void *ret_value;
+	
+	argumentos_thread arg_kernel;
+	argumentos_thread arg_memoria;
+	
     logger = log_create("entradasalida.log", "entradasalida", 1, LOG_LEVEL_DEBUG);
     config_global = config_create("../utils/config/config_global.config");
 
-	puerto_memoria = config_get_string_value(config_global, "PUERTO_IO->MEMORIA");
-	puerto_kernel = config_get_string_value(config_global, "PUERTO_IO->KERNEL");
+	arg_memoria.puerto = config_get_string_value(config_global, "PUERTO_IO->MEMORIA");
+	arg_kernel.puerto = config_get_string_value(config_global, "PUERTO_IO->KERNEL");
     
 	//conexiones
-	pthread_create(&tid_kernel, NULL, conexion_kernel, puerto_kernel);
-	pthread_create(&tid_memoria, NULL, conexion_memoria, puerto_memoria);
+	pthread_create(&tid_kernel, NULL, conexion_kernel, (void *)&arg_kernel);
+	pthread_create(&tid_memoria, NULL, conexion_memoria, (void *)&arg_memoria);
 	//conexiones
 
 	//espero fin conexiones
@@ -39,9 +40,9 @@ void *conexion_kernel(void* arg_kernel)
 	t_list *handshake_recv;
 	char * handshake_texto = "handshake";
 	
-	int server = iniciar_servidor(puerto);
+	int server = iniciar_servidor(args->puerto);
 		log_info(logger, "Servidor listo para recibir al cliente KERNEL");
-		int cliente = esperar_cliente(arg_kernel->puerto);
+		int cliente = esperar_cliente(server);
 
 	//HANDSHAKE
 	handshake_send = crear_paquete(INSTRUCCIONES);
@@ -67,7 +68,7 @@ void *conexion_kernel(void* arg_kernel)
 					break;
 				case -1:
 					log_error(logger, "el cliente se desconecto. Terminando servidor");
-					return EXIT_FAILURE;
+					return (void *)EXIT_FAILURE;
 					break;
 				default:
 					log_warning(logger,"Operacion desconocida. No quieras meter la pata");
@@ -85,7 +86,7 @@ void *conexion_memoria(void* arg_memoria)
 	t_list *handshake_recv;
 	char * handshake_texto = "handshake";
 	
-	int server = iniciar_servidor(arg_memoria->puerto);
+	int server = iniciar_servidor(args->puerto);
 		log_info(logger, "Servidor listo para recibir al cliente MEMORIA");
 		int cliente = esperar_cliente(server);
 
@@ -107,7 +108,7 @@ void *conexion_memoria(void* arg_memoria)
 					break;
 				case -1:
 					log_error(logger, "el cliente se desconecto. Terminando servidor");
-					return EXIT_FAILURE;
+					return (void*)EXIT_FAILURE;
 					break;
 				default:
 					log_warning(logger,"Operacion desconocida. No quieras meter la pata");

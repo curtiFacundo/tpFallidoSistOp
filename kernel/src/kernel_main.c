@@ -25,6 +25,8 @@ int main(int argc, char* argv[])
 	logger = log_create("kernel.log", "Kernel", 1, LOG_LEVEL_DEBUG);
     config_global = config_create("../utils/config/config_global.config");
    	
+	
+
 	//planificador
 	arg_sch.algoritmo = FIFO;
 	pthread_create(&tid_scheduler,NULL,corto_plazo,(void*)&arg_sch);

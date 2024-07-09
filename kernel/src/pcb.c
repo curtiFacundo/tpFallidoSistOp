@@ -51,7 +51,7 @@ void cambiar_estado(pcb* pcb_p, t_estado estado)
 
 // interpretar un archivo y crear una lista de instrucciones
 t_list* interpretarArchivo(FILE* archivo) {
-    FILE *entrada = archivo;
+    FILE *entrada;
     if (entrada == NULL) {
         perror("Error al abrir el archivo");
         return NULL;
