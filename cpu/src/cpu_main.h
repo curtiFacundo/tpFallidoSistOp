@@ -33,9 +33,8 @@ typedef enum
 }t_operaciones;
 
 // Declaraciones de funciones
-
-void *cliente_conexion_KERNEL(char *arg_kernel[]);
-void *conexion_memoria(char *puerto);
+void *cliente_conexion_KERNEL(void *);
+void *conexion_memoria(void *);
 void separarInstrucciones(t_paquete *handshake_recv);
 void Fetch(pcb* pcb);
 void decode();
