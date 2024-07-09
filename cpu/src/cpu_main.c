@@ -113,9 +113,9 @@ void *conexion_memoria(void * arg_memoria)
 				case INTERRUPCION:
 				    recibir_paquete(cliente);
 					handshake_interrupcion = crear_paquete(INTERRUPCION);
-					agregar_a_paquete(handshake_interrupcion, pcb_p->RegistroCPU, sizeof(RegistroCPU));
-					agregar_a_paquete(handshake_interrupcion, pcb_p->pc, sizeof(int));
-					agregar_a_paquete(handshake_interrupcion, pcb_p->pid, sizeof(int));
+					agregar_a_paquete(handshake_interrupcion, pcb_p->registros, sizeof(RegistroCPU));
+					agregar_a_paquete(handshake_interrupcion, &pcb_p->pc, sizeof(int));
+					agregar_a_paquete(handshake_interrupcion, &pcb_p->pid, sizeof(int));
 
 				case INSTRUCCIONES:
 					handshake_recv = recibir_paquete(cliente);
