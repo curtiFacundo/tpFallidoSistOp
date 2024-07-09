@@ -32,11 +32,6 @@ typedef enum
     INVALID_OPERATION 
 }t_operaciones;
 
-typedef struct{
-    RegistroCPU parametros[2];
-    char ID_instruccion;
-}t_instruccion;
-
 // Declaraciones de funciones
 
 void *cliente_conexion_KERNEL(char *arg_kernel[]);
