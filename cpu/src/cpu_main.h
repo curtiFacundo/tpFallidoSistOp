@@ -7,7 +7,7 @@
 #include <commons/log.h>
 #include "../../kernel/src/pcb.h"
 #include "../../utils/src/utils.h"
-
+extern pcb* pcb_p;
 typedef enum  
 {
     SET,

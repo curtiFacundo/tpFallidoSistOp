@@ -3,32 +3,44 @@
 #include <semaphore.h>
 #include "kernel_main.h"
 
+int socket_cliente_cpu;
+int cliente_memoria; // cliente memoria, tendria que cambiar el nombre a un monton de variables
 
 int main(int argc, char* argv[]) 
 {    
 
-
 	pthread_t tid_memoria;
 	pthread_t tid_cpu;
 	pthread_t tid_io;
-	char *ret_value;
-	char *puerto_memoria;
-	char *puerto_cpu;
-	char *arg_io[2]; // [PUERTO | IP]
+	pthread_t tid_scheduler;
+
+	argumentos_thread_scheduler arg_sch;
+
+	void *ret_value;
+	argumentos_thread arg_io;
+	argumentos_thread arg_memoria;
+	argumentos_thread arg_cpu;
 
 
 	logger = log_create("kernel.log", "Kernel", 1, LOG_LEVEL_DEBUG);
     config_global = config_create("../utils/config/config_global.config");
    	
-	puerto_memoria = config_get_string_value(config_global, "PUERTO_KERNEL->MEMORIA");
-	puerto_cpu = config_get_string_value(config_global, "PUERTO_KERNEL->CPU");
-	arg_io[0] = config_get_string_value(config_global, "PUERTO_IO->KERNEL");
-	arg_io[1] = config_get_string_value(config_global, "IP_IO");
+	//planificador
+	arg_sch.algoritmo = FIFO;
+	pthread_create(&tid_scheduler,NULL,corto_plazo,(void*)&arg_sch);
+	pthread_detach(tid_scheduler);
+
 
 	//conexiones
-	pthread_create(&tid_memoria, NULL, conexion_memoria, puerto_memoria);
-	pthread_create(&tid_cpu, NULL, conexion_cpu, puerto_cpu);
-	pthread_create(&tid_io, NULL, cliente_conexion_IO, arg_io);
+	arg_memoria.puerto = config_get_string_value(config_global, "PUERTO_KERNEL->MEMORIA");
+	arg_cpu.puerto = config_get_string_value(config_global, "PUERTO_KERNEL->CPU");
+	arg_io.puerto = config_get_string_value(config_global, "PUERTO_IO->KERNEL");
+	arg_io.ip = config_get_string_value(config_global, "IP_IO");
+
+	//conexiones
+	pthread_create(&tid_memoria, NULL, conexion_memoria, (void *)&arg_memoria);
+	pthread_create(&tid_cpu, NULL, conexion_cpu, (void *)&arg_cpu);
+	pthread_create(&tid_io, NULL, cliente_conexion_IO, (void *)&arg_io);
 	//conexiones
 
 	//espero fin conexiones
@@ -40,16 +52,17 @@ int main(int argc, char* argv[])
 	return 0;
 }
 
-void *conexion_cpu(char* puerto)
+void *conexion_cpu(void* arg_cpu)
 {
+	argumentos_thread * args = arg_cpu; 
 	t_paquete *handshake_send;
-	t_paquete *handshake_recv;
+	t_list *handshake_recv;
 	char * handshake_texto = "handshake";
 	
-	int server = iniciar_servidor(puerto);
-		log_info(logger, "Servidor listo para recibir al cliente CPU");
-		int cliente = esperar_cliente(server);
-
+	int server = iniciar_servidor(args->puerto);
+	log_info(logger, "Servidor listo para recibir al cliente CPU");
+	
+	socket_cliente_cpu = esperar_cliente(server);
 	//HANDSHAKE
 	handshake_send = crear_paquete(HANDSHAKE);
 	agregar_a_paquete (handshake_send, handshake_texto , strlen(handshake_texto)+1);
@@ -57,18 +70,18 @@ void *conexion_cpu(char* puerto)
 
 
 		while(true){
-			int cod_op = recibir_operacion(cliente);
+			int cod_op = recibir_operacion(socket_cliente_cpu);
 			switch (cod_op)
 			{
 				case HANDSHAKE:
-					handshake_recv = recibir_paquete(cliente);
+					handshake_recv = recibir_paquete(socket_cliente_cpu);
 					log_info(logger, "me llego:\n");
 					list_iterate(handshake_recv, (void*) iterator);
-					enviar_paquete(handshake_send, cliente);
+					enviar_paquete(handshake_send, socket_cliente_cpu);
 					break;
 				case -1:
 					log_error(logger, "el cliente se desconecto. Terminando servidor");
-					return EXIT_FAILURE;
+					return (void *)EXIT_FAILURE;
 					break;
 				default:
 					log_warning(logger,"Operacion desconocida. No quieras meter la pata");
@@ -77,17 +90,18 @@ void *conexion_cpu(char* puerto)
 		}
 		
 	close(server);
-	close(cliente);
+	close(socket_cliente_cpu);
 }
-void *conexion_memoria(char* puerto) 
+void *conexion_memoria(void* arg_memoria) 
 {
+	argumentos_thread * args = arg_memoria;
 	t_paquete *handshake_send;
-	t_paquete *handshake_recv;
+	t_list *handshake_recv;
 	char * handshake_texto = "handshake";
 	
-	int server = iniciar_servidor(puerto);
-		log_info(logger, "Servidor listo para recibir al cliente MEMORIA");
-		int cliente = esperar_cliente(server);
+	int server = iniciar_servidor(args->puerto);
+	log_info(logger, "Servidor listo para recibir al cliente MEMORIA");
+	cliente_memoria = esperar_cliente(server);  // declaraba cliente aca "int cliente" lo saque para que sea general arriba de todo
 
 	//HANDSHAKE
 	handshake_send = crear_paquete(HANDSHAKE);
@@ -96,18 +110,18 @@ void *conexion_memoria(char* puerto)
 
 
 		while(true){
-			int cod_op = recibir_operacion(cliente);
+			int cod_op = recibir_operacion(cliente_memoria);
 			switch (cod_op)
 			{
 				case HANDSHAKE:
-					handshake_recv = recibir_paquete(cliente);
+					handshake_recv = recibir_paquete(cliente_memoria);
 					log_info(logger, "me llego:\n");
 					list_iterate(handshake_recv, (void*) iterator);
-					enviar_paquete(handshake_send, cliente);
+					enviar_paquete(handshake_send, cliente_memoria);
 					break;
 				case -1:
 					log_error(logger, "el cliente se desconecto. Terminando servidor");
-					return EXIT_FAILURE;
+					return (void *)EXIT_FAILURE;
 					break;
 				default:
 					log_warning(logger,"Operacion desconocida. No quieras meter la pata");
@@ -116,11 +130,12 @@ void *conexion_memoria(char* puerto)
 		}
 		
 	close(server);
-	close(cliente);
+	close(cliente_memoria);
 }
 
-void *cliente_conexion_IO(char * arg_io[]){
+void *cliente_conexion_IO(void * arg_io){
 
+	argumentos_thread * args = arg_io;
 	t_paquete* send_handshake_io;
 	int conexion_IO_KERNEL;
 	protocolo_socket op;
@@ -130,7 +145,7 @@ void *cliente_conexion_IO(char * arg_io[]){
 
 	do
 	{
-		conexion_IO_KERNEL = crear_conexion(arg_io[1], arg_io[0]);
+		conexion_IO_KERNEL = crear_conexion(args->ip, args->puerto);
 		sleep(1);
 
 	}while(conexion_IO_KERNEL == -1);

@@ -1,10 +1,14 @@
 #include <utils.h>
 
-//defines de operaciones
-#define OPERACION1 0
-
 t_log* logger;
 t_config* config_global;
+
+//colas planificador
+t_list *sch_cola_ready,*sch_cola_new,*sch_cola_new_plus,*sch_cola_block,*sch_cola_exec;
+
+//semaforos
+sem_t sem_p_ready;
+pthread_mutex_t m_cola_new, m_cola_ready, m_cola_new_plus,m_cola_exec;
 
 
 void decir_hola(char* quien) {
@@ -208,6 +212,8 @@ void decir_hola(char* quien) {
     {
         close(socket_cliente);
     }
+
+
 //socket
 
 void leer_consola()

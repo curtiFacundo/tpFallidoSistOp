@@ -11,6 +11,7 @@ pcb* crear_pcb(int pid, int quantum, RegistroCPU registros)
     pcb_p->quantum = 0;
     pcb_p->estado = NEW;
     pcb_p->registros = malloc(sizeof(RegistroCPU));
+    pcb_p->instrucciones = malloc(sizeof(t_list));
     return pcb_p;
 }
 

@@ -3,6 +3,7 @@
 
 #include  <stdint.h> 
 #include <utils.h>
+
 typedef enum  
 {
     NEW,
@@ -37,6 +38,7 @@ typedef struct {
     int pid;
     int pc;
     int quantum;
+    int tabla_paginas;
     t_estado estado;
     RegistroCPU* registros;
     t_list* instrucciones;
@@ -48,5 +50,6 @@ void eliminar_PCB(pcb* pcb_p);
 void cambiar_estado(pcb* pcb_p, t_estado estado);
 t_list* interpretarArchivo(FILE* archivo);
 void liberarInstrucciones(t_list* instrucciones);
+void element_destroyer(void* elemento);
 
 #endif

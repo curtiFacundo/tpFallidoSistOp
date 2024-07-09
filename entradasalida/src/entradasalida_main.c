@@ -32,15 +32,16 @@ int main(int argc, char* argv[]) {
     return 0;
 }
 
-void *conexion_kernel(char* puerto) 
+void *conexion_kernel(void* arg_kernel) 
 {
+	argumentos_thread * args = arg_kernel;
 	t_paquete *handshake_send;
-	t_paquete *handshake_recv;
+	t_list *handshake_recv;
 	char * handshake_texto = "handshake";
 	
 	int server = iniciar_servidor(puerto);
 		log_info(logger, "Servidor listo para recibir al cliente KERNEL");
-		int cliente = esperar_cliente(server);
+		int cliente = esperar_cliente(arg_kernel->puerto);
 
 	//HANDSHAKE
 	handshake_send = crear_paquete(INSTRUCCIONES);
@@ -77,13 +78,14 @@ void *conexion_kernel(char* puerto)
 	close(server);
 	close(cliente);
 }
-void *conexion_memoria(char* puerto) 
+void *conexion_memoria(void* arg_memoria) 
 {
+	argumentos_thread * args = arg_memoria;
 	t_paquete *handshake_send;
-	t_paquete *handshake_recv;
+	t_list *handshake_recv;
 	char * handshake_texto = "handshake";
 	
-	int server = iniciar_servidor(puerto);
+	int server = iniciar_servidor(arg_memoria->puerto);
 		log_info(logger, "Servidor listo para recibir al cliente MEMORIA");
 		int cliente = esperar_cliente(server);
 
