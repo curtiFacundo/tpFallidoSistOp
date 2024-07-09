@@ -14,11 +14,12 @@ int main(void) {
 	
 	pthread_t tid_memoria;
 	pthread_t tid_kernel;
-	char *ret_value;
-	char *puerto_memoria;
-	char *arg_kernel[2]; // [PUERTO | IP]
+	void *ret_value;
+	argumentos_thread arg_kernel;
+	argumentos_thread arg_memoria;
 	
 
+    //int socket_id = iniciar_servidor();
     config_global = config_create("../utils/config/config_global.config");
 
 	arg_memoria.puerto = config_get_string_value(config_global, "PUERTO_CPU->MEMORIA");
@@ -36,7 +37,7 @@ int main(void) {
 	pthread_join(tid_kernel, ret_value);
 	//espero fin conexiones
 
-    // Liberación de recursos y finalización
+	// terminar_programa(server_fd_memoria, logger, config_global); //logger: redundante (global) pero esta definido asi en utils.h
     return 0;
 }
 void *cliente_conexion_KERNEL(void * arg_kernel){
